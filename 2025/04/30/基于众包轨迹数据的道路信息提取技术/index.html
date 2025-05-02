@@ -1,0 +1,1899 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>基于众包轨迹数据的道路信息提取技术 | 鸿哲斋414</title><meta name="author" content="JingHan Zhang"><meta name="copyright" content="JingHan Zhang"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="1 项目背景与研究目标  项目背景  在汽车电动化、智能化、联网化、共享化的产业进化趋势下，自动驾驶汽车 成为全球的重要研究热点和发展趋势。车道级高精度地图是自动驾驶重要的共性 基础技术，具备不可替代的作用。高精度地图蕴含信息丰富，含有道路类型、曲 率、车道线位置等道路信息，以及路边基础设施、障碍物、交通标志等环境对象 信息，同时包括交通流量、红绿灯状态信息等实时动态信息，能够为汽车构建“长 周期">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于众包轨迹数据的道路信息提取技术">
+<meta property="og:url" content="https://coder-will.github.io/2025/04/30/%E5%9F%BA%E4%BA%8E%E4%BC%97%E5%8C%85%E8%BD%A8%E8%BF%B9%E6%95%B0%E6%8D%AE%E7%9A%84%E9%81%93%E8%B7%AF%E4%BF%A1%E6%81%AF%E6%8F%90%E5%8F%96%E6%8A%80%E6%9C%AF/index.html">
+<meta property="og:site_name" content="鸿哲斋414">
+<meta property="og:description" content="1 项目背景与研究目标  项目背景  在汽车电动化、智能化、联网化、共享化的产业进化趋势下，自动驾驶汽车 成为全球的重要研究热点和发展趋势。车道级高精度地图是自动驾驶重要的共性 基础技术，具备不可替代的作用。高精度地图蕴含信息丰富，含有道路类型、曲 率、车道线位置等道路信息，以及路边基础设施、障碍物、交通标志等环境对象 信息，同时包括交通流量、红绿灯状态信息等实时动态信息，能够为汽车构建“长 周期">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://coder-will.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2025-04-30T07:44:45.000Z">
+<meta property="article:modified_time" content="2025-04-30T07:54:42.000Z">
+<meta property="article:author" content="JingHan Zhang">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://coder-will.github.io/img/avatar.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "基于众包轨迹数据的道路信息提取技术",
+  "url": "https://coder-will.github.io/2025/04/30/%E5%9F%BA%E4%BA%8E%E4%BC%97%E5%8C%85%E8%BD%A8%E8%BF%B9%E6%95%B0%E6%8D%AE%E7%9A%84%E9%81%93%E8%B7%AF%E4%BF%A1%E6%81%AF%E6%8F%90%E5%8F%96%E6%8A%80%E6%9C%AF/",
+  "image": "https://coder-will.github.io/img/avatar.jpg",
+  "datePublished": "2025-04-30T07:44:45.000Z",
+  "dateModified": "2025-04-30T07:54:42.000Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "JingHan Zhang",
+      "url": "https://coder-will.github.io/"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/zjh.png"><link rel="canonical" href="https://coder-will.github.io/2025/04/30/%E5%9F%BA%E4%BA%8E%E4%BC%97%E5%8C%85%E8%BD%A8%E8%BF%B9%E6%95%B0%E6%8D%AE%E7%9A%84%E9%81%93%E8%B7%AF%E4%BF%A1%E6%81%AF%E6%8F%90%E5%8F%96%E6%8A%80%E6%9C%AF/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '基于众包轨迹数据的道路信息提取技术',
+  isHighlightShrink: false,
+  isToc: false,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><img class="site-icon" src="/img/zjh.png" alt="Logo"><span class="site-name">鸿哲斋414</span></a><a class="nav-page-title" href="/"><span class="site-name">基于众包轨迹数据的道路信息提取技术</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">基于众包轨迹数据的道路信息提取技术</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-04-30T07:44:45.000Z" title="发表于 2025-04-30 15:44:45">2025-04-30</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-04-30T07:54:42.000Z" title="更新于 2025-04-30 15:54:42">2025-04-30</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p><strong>1</strong> 项目背景与研究目标</p>
+<ol>
+<li>项目背景</li>
+</ol>
+<p>在汽车电动化、智能化、联网化、共享化的产业进化趋势下，自动驾驶汽车 成为全球的重要研究热点和发展趋势。车道级高精度地图是自动驾驶重要的共性 基础技术，具备不可替代的作用。高精度地图蕴含信息丰富，含有道路类型、曲 率、车道线位置等道路信息，以及路边基础设施、障碍物、交通标志等环境对象 信息，同时包括交通流量、红绿灯状态信息等实时动态信息，能够为汽车构建“长 周期记忆”、实现汽车超视感知，并有效提高算法效率和安全冗余。高精度地图 已经成为学术界和工业界竞相争夺的战略制高点。</p>
+<p>高精地图因自动驾驶技术需求而诞生，作为自动驾驶汽车先验的知识库与空 间基准，其提供了高精度、高丰富度、高动态性与高可靠性的数据服务。然而， 国内公路里程长，更新频繁，依托专业测量技术难以实现高精地图对上述道路的 全覆盖与高频更新，制约了其在自动驾驶领域的全面落地与应用。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.001.png"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.002.png"></p>
+<p>图 <strong>1-1</strong> 高精地图</p>
+<p>传统地图道路信息采集方法一般采用人工测量的方式，耗时长且工程量大， 由于当代城市道路网络更新迅速，人工测量的方式无法满足路网更新的实时性需 求，同时，路口的交通规则等信息也需要同交通部门获取，增加了这一任务的复 杂性。近年来，随着传感器技术及其对地观测平台技术的发展，已经存在空天地、 多层次的道路信息采集研究方法（如图 1-2 所示），可一次性高精度地采集大范 围道路几何信息和语义信息。目前，百度、四维图新、高德等图商均采用车载移 动采集系统对道路进行集中采集。然而，这些专业设备集中采集方式更新频率低、 采集成本高。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.003.png"></p>
+<p>图 <strong>1-2</strong> 常见道路信息采集方式</p>
+<p>众包为高精地图构建提供了一种通过群智感知解决上述问题的新模式。众包 模式基于城市交通系统中无处不在的移动感知终端，不依赖专业的移动测量系统 （Mobile Mapping System），具有成本低、空间覆盖广、更新及时等特点。日益 发展的人工智能与大数据技术在视觉感知（如目标检测、跟踪与分割）与交通系 统认知（如实时感知和动态更新）中取 得了一定进展，为众包高精地图构建 提供了可靠的技术支撑，是众包高精地图规模化生产与应用的关键技术。</p>
+<ol start="2">
+<li>项目概述</li>
+</ol>
+<p>基于长安汽车现有量产级车辆搭载的传感器（前视觉摄像头、GNSS+RTK、 IMU、轮速），实现众包地图落地。其中，众包地图需要满足高级别自动驾驶的 需求（如：车道级定位、车道级导航）。众包地图成图区域需要满足城区全场景 覆盖（包括 GNSS 失效）场景及高速、城快场景。</p>
+<p>车载轨迹数据从空间位置、时间、移动模式等维度记录了车辆与城市交通路 网的交互活动。车辆作为一种与城市交通系统交互最频繁的“传感器”，形成的 轨迹数据覆盖面广、重访率高且具有时效性，同时高频、高精的定位技术为基于 众包轨迹提取车道级路网信息提供了数据支持。对于实时、海量轨迹数据的分析</p>
+<p>与挖掘任务，分布式处理、流式计算、大数据分析、深度学习等提供了技术支撑。 因此，基于众包轨迹数据可实现车道级路网信息的准确提取与动态更新，按照提 取对象可分为道路路网提取、车道几何信息提取与交叉口拓扑信息提取。</p>
+<p>当前，北斗卫星导航系统（BDS）、全球定位系统（GPS）、格洛纳斯系统 （GLONASS）、伽利略定位系统（GALIEO）等全球卫星导航系统（GNSS）的 单点定位精度已经提升至米级。实时差分定位（RTK）技术依靠 CORS，使用信 号载波的测量值实时校正 GNSS 误差，可实时提供高达厘米级和分米级别精度。 此外，精密单点定位技术（PPP）和 PPP-RTK 技术利用精密卫星轨道和精密卫星 钟差纠正，可在短时间内提供厘米定位。这些 GNSS 技术的发展，已经为道路级 测 图 转 向 车 道 级 测 图 提 供 了 技 术 支 撑 。 随 着 互 联 网 和 信 息 技 术 的 发 展 ， 众 包 （CrowdSouring）和志愿地理信息（VGI）数据涌现，如 OpenStreetMap、DataMine、 Flickr 等数据众包网站，提供了时间鲜度高、成本低的数据生产方式，使得基于 众包轨迹的车道级测图成为可能。由于众包轨迹数据对于城市道路区域的覆盖面 广而且具有很高的时效性，可为自动化、高效率地提取城市基础道路信息提供了 可能。众包采集模式的发展进程也正在随着测绘、地图管理法律法规的逐步开发 和发展不断加速。</p>
+<p>本课题研究基于众包轨迹数据的道路拓扑信息提取，围绕长安提供的轨迹数 据，研究高效算法从轨迹数据中挖掘道路几何信息，车道数量，交叉口，转向交 通规则等导航相关信息，为上层的自动驾驶提供高精度地图的底层数据支持。</p>
+<ol start="3">
+<li><p>研究目标</p>
+<p>本项目包含以下三个研究目标；</p>
+</li>
+</ol>
+<p>（1）研发高效的算法来提升轨迹数据清洗的质量：现有的大多数轨迹清洗 方法单独对每一条轨迹分析，同时轨迹清洗基于的是轨迹内部的局部特征，实际 复杂的路网如立交桥等会影响轨迹清洗的质量，因此需要设计算法应对上述问题 以提升轨迹清洗的效果，过滤出高质量的轨迹用于后续的分析。</p>
+<p>（2）研发高效的多车道信息提取算法：设计数据挖掘算法分析轨迹提取道 路几何信息与路网框架结构，然后对每一条道路分析其车道数量及位置。</p>
+<p>（3）研发高效的道路拓扑信息提取算法：设计基于计算机视觉的交叉口提 取算法，对单个交叉口识别其路口位置以及统计各个路口间的流量，然后基于以 上信息分析路口转向信息以及交通规则。</p>
+<ol start="4">
+<li>完成情况总览</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>文件夹</th>
+<th>实际完成 &#x2F;指标数量</th>
+<th>完成情况</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>专利</td>
+<td>3&#x2F;3</td>
+<td>已完成</td>
+</tr>
+<tr>
+<td>2</td>
+<td>论文</td>
+<td>4&#x2F;3</td>
+<td>已完成</td>
+</tr>
+<tr>
+<td>3</td>
+<td>标准</td>
+<td>0&#x2F;0</td>
+<td>&#x2F;</td>
+</tr>
+<tr>
+<td>4</td>
+<td>软著</td>
+<td>0&#x2F;0</td>
+<td>&#x2F;</td>
+</tr>
+<tr>
+<td>5</td>
+<td>进展报告</td>
+<td>33</td>
+<td>&#x2F;</td>
+</tr>
+<tr>
+<td>6</td>
+<td>会议纪要</td>
+<td>文件夹形式</td>
+<td><p>1.周会会议纪要 2.月度会线下的会</p><p>议纪要 3.交流等</p></td>
+</tr>
+<tr>
+<td>7</td>
+<td>源代码文档</td>
+<td>文件夹形式</td>
+<td>已完成</td>
+</tr>
+<tr>
+<td>8</td>
+<td>算法指标</td>
+<td>测试报告形式</td>
+<td>已满足</td>
+</tr>
+<tr>
+<td>9</td>
+<td>文档</td>
+<td>文件夹形式</td>
+<td>1.月度例会；2.学术 交流文档；3.前沿 资讯</td>
+</tr>
+<tr>
+<td>10</td>
+<td>培训证明</td>
+<td><p>包含在学术交</p><p>流等中</p></td>
+<td>已完成</td>
+</tr>
+<tr>
+<td>11</td>
+<td><p>完成的技术</p><p>方案</p></td>
+<td>1</td>
+<td>已完成</td>
+</tr>
+<tr>
+<td>12</td>
+<td>调研报告</td>
+<td>1</td>
+<td>已完成</td>
+</tr>
+<tr>
+<td>13</td>
+<td>项目总结</td>
+<td>1</td>
+<td>已完成</td>
+</tr>
+</tbody></table>
+<p><strong>2</strong> 国内外研究现状</p>
+<p>现有国内相关文献大多针对低定位精度的众包轨迹数据提取道路级别的路 网信息，少数研究对小范围区域（如厂区和高速路段）进行车道级别信息提取， 针对高定位精度的众包轨迹提取城市规模车道级路网信息的研究较少，如图 2-1 所示。已有相关工作可划分为轨迹数据预处理、交叉口信息提取、道路路网信息 提取、车道几何信息提取。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.004.jpeg"></p>
+<p>图 <strong>2-1</strong> 相关研究采用的开源众包轨迹数据：滴滴成都开源数据（左）；微软 <strong>T-Driver</strong> 北京出</p>
+<p>租车数据（中）；芝加哥公交车数据（右）</p>
+<p>其中交叉口信息提取、道路路网信息提取、车道几何信息提取研究现状与趋 势总结如下：</p>
+<p>表 <strong>2-1</strong> 基于众包轨迹数据的地图要素提取方法分类<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.005.png"></p>
+<p>提取对象 方法分类 趋势 特点 交叉口拓扑 传统规则 &#x2F; 特定数据集效果好，需人工设计特 信息<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.006.png"> 机器、深度学习 方法从机器学习到深度学 泛化能力强，效果受训练样本影响 交叉链接 场景从平面交叉口到立交 分而治之，适用于复杂交通场景<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.007.png"></p>
+<p>道路路网 基于图像处理 方法从传统方法到深度学 效率高但依赖样本质量，拓扑易缺 增量合并 结合处理对象的上下文关 支持并行处理，效果受样本质量影</p>
+<p>车道几何信 基于概率分布 利用先验信息降低计算开 结果准确，依赖于样本数量计算开<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.008.png"></p>
+<p>息 基于聚类 从车道路网生成到路网更 适用提取与更新，效果受样本质量 新 影响<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.009.png"></p>
+<ol>
+<li><p>轨迹数据预处理 轨迹数据作为轨迹大数据的处理对象,轨迹数据的质量将直接影响轨迹数据 挖掘的效果。同时,针对不同的应用场景与挖掘目标,采用不同的预处理方式具有 重要作用。因此轨迹数据预处理主要目的是面向实际需求去除轨迹中的噪声并保</p>
+<p>留关键的信息以便于对应的数据挖掘场景，可分为轨迹清洗、轨迹分段与轨迹压 缩三个步骤。</p>
+<p>轨迹清洗：主要解决的问题包括识别并剔除轨迹数据中异常观测点及降低轨 迹自身包含的噪声，其一般作为轨迹预处理阶段的任务。对于众包测图技术而言， 轨迹清洗具有重要的意义，可用于识别和提取不同质量的轨迹，以及提升后续的 分析如多车道识别的准确度。轨迹清洗包含的分析有剔除轨迹冗余信息，提取关 键特征点，提取语义相关的子轨迹等。已有文献中专门针对轨迹清洗的研究较少， 一般作为预处理阶段的非关键性方法介绍。常见的轨迹清洗方式可以归为两类： 基于滤波、基于规则。</p>
+</li>
+</ol>
+<p>表 <strong>2-2</strong> 轨迹清洗相关文献</p>
+<table><tr><th colspan="1" valign="top">研究方法</th><th colspan="16" valign="top">参考文献</th></tr>
+<tr><td colspan="1" rowspan="3" valign="top">基于滤波</td><td colspan="1"></td><td colspan="2"></td><td colspan="2" valign="top">and</td><td colspan="2" valign="top">John</td><td colspan="4"></td></tr>
+<tr><td colspan="6" valign="top">Potamias,</td><td colspan="4" valign="top">M,</td><td colspan="2" valign="top">et</td><td colspan="1" valign="top">[2]</td><td colspan="3" valign="top">,2006</td></tr>
+<tr><td colspan="8" valign="top">Mahmood</td><td colspan="6" valign="top">Rahmani,</td><td colspan="1" valign="top">et</td><td colspan="1" valign="top">.[3],2010</td></tr>
+<tr><td colspan="1" rowspan="2" valign="top">基于规则</td><td colspan="2" valign="top">Y</td><td colspan="2" valign="top">U</td><td colspan="5" valign="top">Zheng,</td><td colspan="7" valign="top">et.[4],2015</td></tr>
+<tr><td colspan="16" valign="top">Du, et al.[5],2021</td></tr>
+</table>
+
+<p>基于滤波解决的问题包括降低及去除轨迹数据中的噪声，一般采取滤波器的 方式，包括平均值滤波、中位数滤波、卡尔曼滤波与启发式的滤波等，分别提取 多个连续观测点的平均值及中位数，以及基于运动特征修正观测点。三种滤波器 的例子如图 2-1 所示。平均值滤波的效果会受到轨迹中异常观测点的影响，相比 之下中位数滤波有更好的鲁棒性。卡尔曼滤波器具有低延迟，丰富的状态信息（如 速度）以及包含观测的不确定性信息。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.010.jpeg"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.011.png"></p>
+<p>图 <strong>2-2</strong> 轨迹降噪的平均值滤波**(<strong>左</strong>)**、中位数滤波（中）与卡尔曼滤波（右）</p>
+<p>启发式滤波对于一个轨迹点 g 来说，要想判断该点是否合理。选取 g 点 d 米范围之内的所有轨迹点，统计这些轨迹的个数 number。</p>
+<p>对于一条轨迹来说，统计每个点的 d 米范围之内的所有轨迹点的个数，该个 数用 t_number 表示。</p>
+<p>而如果 number &lt; t_number，则考虑该轨迹点为异常轨迹点。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.012.png"></p>
+<p>图 <strong>2-3</strong> 启发式滤波算法</p>
+<p>在利用车辆轨迹的运动特征进行轨迹清洗的研究中，从车辆运动学的基本规 律、驾驶行为的合理性以及交通规则标准出发，可以确定车辆运动的各个运动特 征的合理范围，根据特征是否在合理范围内或者相对于合理范围的偏离程度实现 对车辆轨迹数据的质量评估。王风伟提出了车辆轨迹速度特征的一致性问题：对 于某一条车辆轨迹，对其邻近轨迹的速度求平均，作为该轨迹运动速度理论上的 合理值，最后计算该轨迹的实际速度与理论的合理值的偏离程度以描述车辆轨迹 速度特征的一致性。并用于对轨迹进行质量评估和异常轨迹数据的识别。</p>
+<p>表 <strong>2-3</strong> 基于规则的轨迹清洗相关文献</p>
+<table><tr><th colspan="1" valign="top">研究方法</th><th colspan="5" valign="top">参考文献</th></tr>
+<tr><td colspan="1" rowspan="3" valign="top">基于运动特征</td><td colspan="5" valign="top">Wang.[1],2017</td></tr>
+<tr><td colspan="2" valign="top">Punzo</td><td colspan="2" valign="top">V,et</td><td colspan="1" valign="top">[2],2011</td></tr>
+<tr><td colspan="1" valign="top">Lin,</td><td colspan="2" valign="top">et</td><td colspan="2" valign="top">.[3],2020</td></tr>
+<tr><td colspan="1" rowspan="2" valign="top">基于时序特征</td><td colspan="5" valign="top">Wang.[1],2017</td></tr>
+<tr><td colspan="5" valign="top">Yang C, et al.[4],2019</td></tr>
+<tr><td colspan="1" valign="top">基于空间特征</td><td colspan="2" valign="top">Punzo</td><td colspan="2" valign="top">V,et</td><td colspan="1" valign="top">[2],2011</td></tr>
+</table>
+
+<p>Punzo 等提取了轨迹数据的加速度和急动度两类运动特征，并通过设定阈值 的方法确定这两类运动特征的合理分布范围，通过阈值筛选的方式识别异常的轨 迹数据，对轨迹数据进行二分类。林宇提取了轨迹数据的速度、加速度和急动度 三类运动特征，识别这些特征的离群值，筛选离群值对应的轨迹点作为可能存在 异常的轨迹数据。Yang 提取了车辆轨迹的转角、长度、持续时间和速度四类运</p>
+<p>动特征，给定四类运动特征标准差的期望值，计算这四类运动特征在一定时间范 围内的期望值与标准差之比作为轨迹初步的时序特征，对于每个轨迹点，以一定 的时间范围对初步的时序特征取最小值作为该点最终的时序特征，最后通过对四 类时序特征指定权重，得到各轨迹点的质量分数。通过对轨迹数据进行质量评估， 清洗掉低质量的轨迹数据，是基于规则的轨迹数据预处理手段之一。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.013.png"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.014.jpeg"></p>
+<p>图 <strong>2-4</strong> 基于规则：自适应轨迹质量评估模型</p>
+<p>对于本项目而言使用的原始数据集为高精度轨迹数据。是否采用滤波或简化 策略存在考量空间。不同于基于滤波和基于简化的方式，基于规则的处理方式在 很大程度上能够保留轨迹数据的原始信息，是适用于高精度轨迹数据预处理的方 法之一。</p>
+<p>轨迹分段：对于长时间的轨迹观测数据，根据对象 ID 划分成的轨迹会过长， 对后续的分析造成不便，一般按照时间进行分割得到单个行程，如图 2-5 (a)所示， 类似的分割方式包括基于转角点和形状特征点，如图 2-5 (b-d)所示。另外一种常 见的分割方式是在从轨迹数据中依据停止点检测特定的活动区域，如 2-5d 所示。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.015.png"></p>
+<p>图 <strong>2-5</strong> 轨迹分割的常用方法</p>
+<p>轨迹压缩：GPS 设备的采样频率对轨迹的影响较大：若采样频率很高，轨迹 就比较精确；若采样频率很低，轨迹由很少的点构成，此时轨迹与物体真实移动 的路径相差很大。但是若采样频率很高，产生更多的轨迹点，会给数据存储带来 巨大的挑战。因此，我们需要在轨迹的准确率和存储空间上做权衡。如表 1 所示， 考虑到轨迹具有时间属性，文献[2-3]同时考虑时间和空间信息，在压缩轨迹的同 时，满足轨迹的精度要求。随着城市路网的成熟，文献[4-10]借助路网结构，把 轨迹从点的序列转化为路段的序列，许多个轨迹点只需用一条边来表示，从而达</p>
+<p>到压缩目的。为了方便人们理解轨迹的状态，使用兴趣点（Point of Interest，POI） 来记录轨迹经过的重要位置是一种很合理的方法，对于城市中熟悉的 POI，人们 能比较容易看懂轨迹的运行踪迹。</p>
+<p>轨迹压缩技术的性能度量和错误度量指标设定需要考虑算法的执行时间、压 缩率和误差偏差（精确度）等。其中第二点和第三点要两者权衡，共同达到帕雷 托最优。通过计算原轨迹和优化轨迹各对应点的欧几里得距离，即可通过平均或 总欧几里得距离求测量误差。</p>
+<p>表 <strong>2-4</strong> 轨迹压缩相关文献</p>
+<table>
+<thead>
+<tr>
+<th>算法</th>
+<th>类别</th>
+<th align="left">时间复杂度 （<strong>N</strong> 为轨迹点数量）</th>
+<th>误差度量</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Uniform Sampling[1]</td>
+<td>离线压缩</td>
+<td align="left">O(N)</td>
+<td>无</td>
+</tr>
+<tr>
+<td>DP[2]</td>
+<td>离线压缩</td>
+<td align="left">O(N2)、O(N×logN)、O(N)</td>
+<td>欧氏距离</td>
+</tr>
+<tr>
+<td>TD-TR[3]</td>
+<td>离线压缩</td>
+<td align="left">O(N2)</td>
+<td>时间比例的空间距离</td>
+</tr>
+<tr>
+<td>Reservoir Sampling[4]</td>
+<td>在线压缩</td>
+<td align="left">O(R×(1+logN&#x2F;R))</td>
+<td>无</td>
+</tr>
+<tr>
+<td>Sliding Window[5]</td>
+<td>在线压缩</td>
+<td align="left">O(N2)</td>
+<td>垂直欧氏距离</td>
+</tr>
+<tr>
+<td>Open Window[6]</td>
+<td>在线压缩</td>
+<td align="left">O(N2)</td>
+<td>时间同步欧氏距离</td>
+</tr>
+<tr>
+<td>STTrace[7]</td>
+<td>在线压缩</td>
+<td align="left">O(N2)</td>
+<td><p>时间同步欧氏距离、</p><p>方向、速度</p></td>
+</tr>
+<tr>
+<td>SQUISH[8]</td>
+<td>在线压缩</td>
+<td align="left">O(N×logk)，k 为队列大小</td>
+<td>时间同步欧氏距离</td>
+</tr>
+<tr>
+<td>SQUISH-E[9][10]</td>
+<td>在线压缩</td>
+<td align="left">O(N×logN&#x2F;a)，a 为压缩率</td>
+<td>时间同步欧氏距离</td>
+</tr>
+<tr>
+<td>Nonmaterialized[9][10]</td>
+<td>基于路网结构</td>
+<td align="left">O(N+M)，M为路段数</td>
+<td>欧氏距离</td>
+</tr>
+<tr>
+<td>MMTC[9][10]</td>
+<td>基于路网结构</td>
+<td align="left">O(N2×logN)</td>
+<td>轨迹序列相似度</td>
+</tr>
+<tr>
+<td>Press[11]</td>
+<td>基于路网结构</td>
+<td align="left">O(N)</td>
+<td>时间同步路网距离、 路网同步时间距离</td>
+</tr>
+<tr>
+<td>Shortest Path Encoding[11]</td>
+<td>基于路网结构</td>
+<td align="left">O(N)</td>
+<td>无</td>
+</tr>
+</tbody></table>
+<p>轨迹压缩方法从技术上主要分为 3 类，如图 2-6 所示：第一类是不基于路网 结构的数据压缩，也叫线段简化压缩（Line Simplification）方法，目标是在误差 允许范围内减少轨迹点的数目，其又可分为离线和在线压缩。第二类是基于地图 匹配的压缩，它需要把轨迹点映射到路段上，结合路网结构来表示原始轨迹，从 而减小数据量。第三类是语义压缩，即把原始轨迹转换为 POI 序列来表示，这 有利于人们理解轨迹的含义。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.016.jpeg"></p>
+<p>图 <strong>2-6</strong> 轨迹压缩方法分类</p>
+<p>（1）线段简化压缩方法</p>
+<p>线段简化压缩技术就是通过删除误差较小的点，从而优化存储，并保障轨迹 的准确率从而满足需求。线段简化压缩技术最早出现在 1970 年代，并且在图像 处理、制图学上应用广泛，其主要思想是，输入一条由点组成的曲线，可以使用 另外一条包含更少的点的曲线来近似原始曲线，并保证与原始曲线之间的差距较 小。把线段简化的思想运用在轨迹数据预处理中，即找到含有更少的点的近似轨 迹来代替原始轨迹，从而达到压缩轨迹的目的。与单纯的曲线不同的是，轨迹数 据不仅仅只有位置信息，还有时间、速度、方向信息。如何改进线段简化方法， 使其在被压缩的情况下保留轨迹的真实特征，也是一直以来研究的方向。线段简 化压缩技术可分为两类：第一类是叫做离线压缩技术，它先收集完一整条轨迹采 样点，然后删除数据中冗余的点。由于这种方法顾及了完整的轨迹序列，相对其 他方法它更容易做到全局更优压缩结果，但消耗了更多的处理时间，适合线下处 理、分析数据的场景。第二类是在线压缩技术，适合需要及时更新移动物体的位 置或者实时交通状况的场景。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.017.png"></p>
+<p>图 <strong>2-7</strong> 道格拉斯**-**普克压缩（左）与滑动窗口方法（右）</p>
+<p>离线压缩技术中最为核心的算法技术为以道格拉斯算法为代表性的轨迹压 缩算法即 DP 算法，DP 算法是用来对大量冗余的图形数据点进行压缩以提取必 要的数据点。算法缺点为时间复杂度高，距离度量未考虑时间信息，而轨迹数据 中的时间信息是非常重要的，这决定了轨迹数据的疏密程度与精准程度。这种算 法的抽稀精度与阈值有很大关系，阈值越大，简化程度越大，点减少的越多；反 之简化程度越低，点保留的越多，形状也越趋于原曲线。</p>
+<p>在线压缩技术最主要的算法为基于滑动窗口的 Sliding Window，更加适用于 保 留 更 多 的 轨 迹 的 细 节 信 息 的 轨 迹 压 缩 处 理 中 如 下 图 所 示 。 此 外 ， TD-TR （Top-Down Time Ratio）算法，自顶向下时间比算法，以时间距离比率度量（时 间欧几里得距离）来代替垂直欧几里得距离。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.018.png"></p>
+<p>图 <strong>2-8</strong> 滑动窗口算法示意图</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.019.png"></p>
+<p>图 <strong>2-9</strong> 滑动窗口算法流程图</p>
+<p>1.2 基于路网结构的压缩算法</p>
+<p>通常线段简化压缩方法基于欧氏空间，而车辆的实际运动受到路网结构的约 束，因此线段简化压缩方法在车辆轨迹压缩上有很大的局限性。例如，在计算出 租车轨迹的行驶长度时，在欧氏空间里只需要对每段线段的长度进行求和。但是 出租车在实际行驶时，并不会沿着两点之间的线段直线行驶，因为路段可能穿过 湖泊或者草地。因此，不能简单地用两点之间的线段距离来当作实际的行驶距离。 近几年，城市的路网结构数据逐渐成熟，结合路网结构的轨迹压缩变得越来越流 行。</p>
+<p>为了降低轨迹数据的误差率，首先对原始轨迹进行 Map-Matching 预处理， 在原始轨迹数据中加入路网结构的好处是:首先，结合路网结构，能保证轨迹落 在路段上，这更具有现实意义。其次，路网结构是稳定的，更改的频率很低，而 轨迹数据却是每时每刻都在产生的。因此路网结构的稳定性和|有限性使得路网 数据可以表示轨迹数据。结合路网结构的压缩方法，我们通常会将轨迹点的序列 转化成所经过的路段的序列，而一个城市的路段是有限的，因此我们可以把无限 的轨迹点转化为有限的路段来进行表示。</p>
+<p>基于路网结构的压缩技术利用静态的路网结构来描述动态的数据，能显著减 小存储空间。由于静态的路网结构更新成本较高，从而导致该方法的灵活性不够。 其次，与经纬度类似地，人们不能直接理解路段数据，需要解压后才能支持路段 查询等功能，从而导致查询效率降低。</p>
+<p>基于语义信息的压缩因与实际需求不相关，在此不进行赘述。</p>
+<ol start="2">
+<li><p>交叉口拓扑信息 道路交叉口是数字道路地图的重要组成部分，是多条互连道路的结合点，其 几何和拓扑特性在移动导航等定位服务中发挥着重要作用。位于交叉口的任何错 误转弯导航都会对司机以及行人的安全造成严重威胁。但是由于复杂的通行规则 以及城市路网信息的频繁更新，及时、准确的交叉路口信息通常很难提取。而每 天有大量的车辆在道路上行驶，并产生相应的众包 GPS 轨迹数据，也有公司派 出专业车队，配备 GPS、传感器和摄像机，在道路上驾驶并记录数据，从而生成 详细的车道级交叉口地图，基于轨迹的交叉口拓扑信息提取主要步骤包含交叉口</p>
+<p>范围检测与车道级拓扑信息提取，按照处理方法主要可分为传统规则与机器、深 度学习两类。</p>
+</li>
+</ol>
+<p>（a）传统规则 （b）机器、深度学<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.020.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.021.png"></p>
+<p>习</p>
+<p>图 <strong>2-10</strong> 交叉口拓扑信息提取方法示意</p>
+<p>（1）传统规则方法</p>
+<p>传 统 规 则 方 法 关 注 结 构 化 道 路 与 交 叉 口 区 域 轨 迹 的 运 动 特 征 差 异 ， 如 Karagiorgou等和 Yang等构建了关于航向角变化量和轨迹点间距离的相似度度量， 从众包轨迹数据中聚类属于交叉口的轨迹点，在求解聚类中心后通过环形外扩确 定范围，最后通过范围内出入口点的连接提取出车道信息，并与路网连接，交叉 口范围识别准确率在 86%。针对普遍存在的低频轨迹数据，Ruhhammer等和 Wang 等 将 空 间 网 格 化 后 分 别 计 算 单 位 内 转 向 密 度 和 航 向 角 的 熵 检 测 交 叉 口 范 围 ， Deng 等通过分析交叉口区域内轨迹点局部密度最大的位置作为交叉口。首先对 所有的车辆轨迹点的转弯角度统计，计算出一般路面和交叉口路面上轨迹点转角 大小的分布特征，采用航向角变化量的局部 G 统计值识别交叉口处的轨迹点和 聚类实现道路交叉口轨迹点提取，并提取了交叉口的大致范围。在此基础上，用 一个圆形边界来划分出交叉口的具体区域并分割出区域内的轨迹线。最后根据交 叉口区域内轨迹具有相似的进&#x2F;出口的特征分组，从每一组中挑选一条轨迹来连 接对应的车道。</p>
+<p>（2）机器、深度学习方法</p>
+<p>2010 年 Fathi 提出了一种基于形状描述子的交叉口提取方法，通过机器学习 的方式从 GNSS 轨迹中寻找交叉口，通过圆形形状描述器用来分析轨迹点中车辆 轨迹的特定模式。首先用一个圆形的移动窗口来表示一个局部的形状描述器，然 后将描述器分为 16*8 个单元，对于每条轨迹通过的单元将增加一个点，然后通</p>
+<p>过对描述器的单元内点密度的分布特征训练，得到交叉口和非交叉口对应的描述 器的特征，最后通过在 GNSS 轨迹上移动描述器来寻找交叉口的大致位置；在此 基础上，在交叉点之间搜寻道路，将道路和交叉口组成完整的道路网络；最后通 过采用迭代最近点算法(Iterative Closest Point, ICP）对交叉口位置不断调整和优 化，将交叉点和所连接的道路在局部范围内与轨迹进行精确匹配，直到计算出一 个高精度的交叉口的位置。Chen 等将轨迹航向角作为特征栅格化后提出了一种 尺度和方向不变的 Traj-SIFT 特征，利用监督学习框架来识别交叉口及其类型， 如 X 型、Y 型、T 型与星型，再通过高斯差分算子确定具体交叉口范围。Yang 等人将深度学习方法引入交叉口检测中，从轨迹点提取转向与速度特征并栅格化， 采用 Mask-RCNN 从栅格影像中检测交叉口并分类，取得了 80%的准确率，并以 矩形检测框范围作为交叉口范围。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.022.png"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.023.png"></p>
+<p>图 <strong>2-11</strong> 基于热点统计得交叉口识别（左）与基于图像的交叉口识别（右）</p>
+<p>综上所述，传统规则方法提取交叉口的方法可以在特定数据集取得较高精度， 但是需要通过人工设计特征来提升准确率且计算量大、效率低。与之对比的是基 于机器学习和深度学习的方法减少了对人工阈值参数的依赖，对不同场景的数据 具有较强的泛化能力。但有监督算法需要大量样本进行训练，算法效果受到样本 选择、样本质量和数量的影响。</p>
+<ol start="3">
+<li>道路路网信息 从轨迹数据中提取道路路网的几何信息和连接信息，构建道路路网框架的方 法按照处理过程不同可以分为：交叉链接、增量式合并与基于图像处理三类方法。</li>
+</ol>
+<p><code>  </code><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.024.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.025.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.026.png"></p>
+<p>（a）交叉链接 （b）基于图像处理 （c）增量式合并</p>
+<p>图 <strong>2-13</strong> 道路路网信息提取方法示意</p>
+<p>（1）交叉链接方法</p>
+<p>通过 2.1.2 中的交叉口识别方法提取道路交叉点之后，再利用聚类与拟合等 方式推断交叉点之间路段的几何信息，最终可生成道路框架。聚类对象通常可分 为轨迹点和子轨迹段，前者在选用距离度量时更加灵活，后者可以有效利用相邻 轨迹点间的联系。对于道路的几何信息表达，可以采用聚类结果中具有代表性的 轨 迹 点 或 子 轨 迹 段 ， 也 可 以 采 取 经 密 度 估 计 如 核 密 度 估 计 （ Kernel Density Estimation）等方法拟合的道路中心线，前者依赖于高质量的轨迹数据，后者需 要较多数据量以便于统计计算。</p>
+<p>（2）基于图像处理方法</p>
+<p>基于图像处理的方法将轨迹数据空间分布图转化为栅格图像，通过图像处理 的方法提取道路框架，寻找关键点作为道路框架的节点。基于传统图像处理方法 提取道路几何信息的算法最早由 Davies 等提出，Shi 等和 Kuntzsch 等补充了道 路间拓扑连接构建的步骤，前者对原始轨迹数据进行核密度聚类生成密度图像， 之后基于 Blob 算法对密度图像的灰度值进行连通性区域检测，根据密度将图像 分割为连通的斑点，连通的斑块可近似为路网框架，最后提取斑块的中心线作为 最终提取的路网框架。</p>
+<p>随着深度学习技术的发展，2020 年 Feng 等提出了一种基于改进 U-Net 从轨 迹中提取城市道路网络结构的方法，其将轨迹数据栅格化和特征提取时，除了轨 迹数据的点特征之外，还引入了速度、方向、从点特征生成的线特征等。对于推 理的道路中心线栅格数据，作者采用后处理完成相应道路间的拓扑连接。实验证 明该模型无法处理复杂交叉口场景，性能也受轨迹点采样间隔的影响。为了克服 数据采样率低的影响，Ruan等提出了一种基于深度学习的地图生成框架 DeepMG。 该框架由几何转换模块与拓扑构建后处理模块构成，相对于单像素预测道路中心</p>
+<p>线，几何转换模块通过道路区域预测，增强推理能力，拓扑构建模块基于轨迹的 后处理算法恢复细碎道路段间的拓扑连通性。Eftelioglu 等受基于卫星影像提取 道路的 DLinkNet 网络架构启发，提出了 Ring-Net。Ring-Net 使用 OSM 道路段 作为模型训练的真值，在 DeepMG 的输入基础上，嵌入了空间注意力机制和基 于中心线的损失函数来改善输出道路的拓扑连接效果。</p>
+<p>（3）增量式合并方法</p>
+<p>增量式合并方法根据轨迹生成道路，逐步在既有道路路网中插入新的道路， 从而提取整体道路几何结构。该类方法最早由 Cao 等提出，首先构建轨迹-轨迹 点间的引斥力模型将轨迹点位置迭代聚拢至同向道路中心，进一步通过遍历轨迹， 依据轨迹点与最邻近道路间欧式距离与方向角差值判断是否插入新的道路节点， 生成新的道路边。为了提升算法对于低频、低精度数据的鲁棒性，Li 等在判断 是否插入新的道路节点时参考了邻近轨迹点情况，与之类似 Buchin 等将子轨迹 段作为插入的基本单元。He 等提出了一种适用于交叉口与复杂立交场景的地图 扩展算法，具体而言该算法随机指定若干轨迹点，通过局部航向滤波前向生成道 路节点，对于已生成的邻近道路节点，若其在前向节点在空间上也相邻，则将其 合并为一个道路节点。Chao 等提出了一种应用于道路路网生成与更新的地图-轨 迹联合优化框架，通过轨迹与既有路网匹配，生成道路质量评价，优化匹配结果 迭代优化三个步骤插入新的道路。</p>
+<p>综上分析可知，交叉链接方法针对交叉口和非交叉口区域差异性的路网结构， 分而治之，适用于复杂场景下的道路路网提取，基于图像处理的路网框架方法效 率高但依赖于数据质量与采样率，同时提取的路网框架的几何精度不高，复杂场 景下拓扑连接关系容易缺失。轨迹增量合并方法生成路网的方法可以将轨迹线并 行输入进行大规模处理，灵活高效，但更适合用于高精度、高采样率的轨迹数据。</p>
+<ol start="4">
+<li>车道几何信息 车道几何信息提取即通过大数据挖掘获取车道中心线的位置，曲率等，依据 处理方法可分为：基于概率分布方法和基于聚类方法。</li>
+</ol>
+<p>（a）基于概率分布<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.027.png"></p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.028.png"></p>
+<p>（b）基于聚类</p>
+<p>图 <strong>2-14</strong> 车道几何信息提取算法示意</p>
+<p>（1）基于概率分布方法</p>
+<p>基于概率分布方法利用轨迹点在道路截面的定位分布拟合概率模型求解车 道中心点的位置、宽度，并通过曲线拟合获取具体的车道中心线几何信息。在同 车道轨迹点定位遵循高斯分布的前提下，Chen 等在 2010 年通过迭代车道数量， 采用高斯混合模型（Gaussian Mixture Model，GMM）建模窗口内的轨迹点数据， 并利用最大期望（Expectation Maximization，EM）算法迭代求解车道宽度与中 心点位置，最后通过卡方检验确定最优车道数及其车道中心点位置。在此基础上， Tang 等利用车道宽度设计规范作为约束条件简化迭代次数，通过后处理剔除误 识 别 车 道 中 心 点 后 ， 将 同 车 道 中 心 点 拟 合 为 车 道 中 心 线 ， 取 得 了 平 均 精 度 为 0.38m 的结果。为了适应城市复杂场景如分歧合流区域的车道几何信息提取，在 2021 年 Arman 等按照道路结构是否变化将轨迹段进行分割，其次在车道建模部 分提出了更严格的约束条件，引入了一个新的正则项来确认车道的数量，结果与 真值的平均误差为 0.55m。然而，GMM-EM 方法需要合理估计初始参数和评价 参数，尤其是面向大范围的车道几何信息提取，计算开销较大。因此，Shu 等先 利用最小二乘法拟合道路中心线，进一步利用统计置信区间获取道路宽度等，优 化了带约束的高斯混合模型的初始参数输入，降低了迭代次数，提升了算法效率。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.029.png"></p>
+<p>图 <strong>2-15</strong> 基于 <strong>GMM-EM</strong> 的车道几何信息提取</p>
+<p>（2）基于聚类</p>
+<p>基于聚类方法通过距离度量聚类归属于同车道的轨迹点&#x2F;段，拟合对应车道 中心线。轨迹聚类是轨迹模式挖掘中一个典型任务。相较于只针对局部 GPS 点 分布，这类方法利用完整的轨迹或者子轨迹作为聚类的输入，强调了轨迹观测点 的顺序性和轨迹的连接关系。通过轨迹聚类，提取经过同一车道的轨迹簇，聚类 后的每组轨迹簇用于车道中心线的估计。</p>
+<p>对于在路网环境下的车辆轨迹聚类，需要高效可靠的算法来发现轨迹的多维 特征以及可扩展和灵活的改进，以适用于复杂的道路网络。现有的车辆轨迹聚类 算法中提出了基于全轨迹或子轨迹的各种相似距离度量，例如传统欧氏距离，最 长公共子序列（LCSS）距离，以及 Hausdorff 和 Frechet 距离等以进行车辆轨迹 聚类。Lee 等人提出一种基于分段的轨迹聚类算法，提出由角度距离、平行距离 和垂直距离构成的距离函数，更全面地衡量轨迹段之间的相似性。Schroedl 等在 误差为 1m 的数据集上提取道路中心线，利用宽度范围构建关于车道数的最优解 函 数 ， 进 一 步 结 合 带 约 束 的 K-means 聚 类 算 法 聚 类 同 车 道 轨 迹 段 ， 取 得 了 0.1m~0.15m 平 均 精 度 。 为 降 低 对 于 先 验 车 道 数 量 的 依 赖 ， Chen 等 提 出 一 种 Traj-Meanshift Sampling 算法，将轨迹点的位置、航向、平均速度作为特征，采 用均值漂移算法聚类同车道轨迹点，利用轨迹的连通性完成拟合的车道中心线连 接。Tsuchiya 等从车辆驾驶行为中受到启发，构建基于道路特征的评价函数，通 过遗传算法求解邻域内全局最优的子轨迹作为车道中心线，降低了自由变道轨迹 对于车道几何信息提取的影响。在实现车道几何信息提取的基础上，一些研究工 作开始聚焦于如何在既有车道路网基础上结合新增轨迹数据生成新的车道路网， 如 Yang 等提出了一种基于地图匹配的新增车道几何信息提取方法，该方法通过 轨迹点的误差椭圆确认匹配的既有路段，进一步构建距离隶属度函数与角度隶属</p>
+<p>度函数，去模糊化后计算轨迹点-既有路段的匹配结果，聚类未成功匹配的轨迹 点 ， 并 拟 合 获 取 新 增 的 车 道 中 心 线 ， 在 半 遮 蔽 道 路 上 取 得 了 平 面 位 置 精 度 为 0.28m 的结果数据。Stanojevic 等提出了一种车道几何信息推理方法，该方法遍 历新输入的轨迹，按照角度与距离进行 K-means 聚类获取计算车道中心点，当邻 域内没有车道中心点时，生成新的道路节点，最后再删除低权重车道降低噪声影</p>
+<p>响。</p>
+<p>综上分析可知，基于概率分布方法从大量轨迹样本中提取车道中心点再拟合 为车道中心线，计算开销大且依赖于大量样本数据，但结果相对准确。基于聚类 方法适用于车道几何信息的提取与更新，对数据样本采样频率与精度要求高，且 需人为设置合理的距离度量获取准确的聚类结果。</p>
+<p><strong>3</strong> 技术路线与研究内容</p>
+<ol>
+<li>技术路线</li>
+</ol>
+<p>本课题采用的技术路线如图 3-1 所示，首先对原始的轨迹数据进行预处理， 包括轨迹的分割降噪和压缩，考虑到交叉口区域的路网结构复杂，本项目分别从 非交叉口区域和交叉口区域两个方向提取路网信息，最后对提取的两类路网信息 进行融合。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.030.jpeg"></p>
+<p>图 <strong>3-1</strong> 总体技术路线图</p>
+<p>本项目的技术路线设计时充分考虑了长安汽车数据独有的特点，长安汽车的 轨迹数据样本可视化如图 3-2 所示。数据采集频率为 100Hz，定位精度为分米级， 记录的信息包括两个时间戳，车辆的位置即经纬度和高程以及姿态信息即偏航角， 俯仰角，滚转角。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.031.jpeg"></p>
+<p>图 <strong>3-2</strong> 长安汽车轨迹数据可视化结果</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.032.jpeg"></p>
+<p>图 <strong>3-2</strong> 长安汽车轨迹数据格式</p>
+<ol>
+<li>轨迹数据预处理 轨迹清洗主要解决的问题是识别并剔除轨迹数据中异常观测值，同时对轨迹 数据进行基本的预处理以满足后续的分析，主要分为轨迹清洗以及轨迹压缩。</li>
+</ol>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.033.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.034.png"></p>
+<p>图 <strong>3-3</strong> 原始轨迹（左）及偏航角分布（右）</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.035.jpeg"></p>
+<p>图 <strong>3-4</strong> 轨迹数据的异常观测点</p>
+<p>轨迹清洗基于轨迹点记录的运动方向和速度信息，采用滤波器等方法对轨迹 中偏离群体移动趋势的观测点和速率变化异常的轨迹点，进行识别和剔除，如图 3-3 与 3-4 所示。</p>
+<p>轨迹压缩针对的是高频轨迹数据中包含的大量冗余信息这一问题，考虑到路 网提取这一特殊问题，将所有的观测点会严重影响后续分析的性能，本项目对于 不同的路段拟采用自适应频率的轨迹点重采样方法，对方向变化较小的直线路段 采用低频率抽样，对于运动方向变化较大曲线路段采用高频率抽样以保留更多的 细节信息，如图 3-5 所示。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.036.png"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.037.png"></p>
+<p>图 <strong>3-5</strong> 轨迹数据压缩</p>
+<ol start="2">
+<li>非交叉口区域路网信息提取</li>
+</ol>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.038.jpeg"></p>
+<p>图 <strong>3-6</strong> 非交叉口区域路网信息提取</p>
+<p>非交叉口区域路网信息提取的技术流程如图 3-6所示，其主要包含两个步骤： 路网框架提取以及车道信息提取。</p>
+<p>路网框架提取首先对原始轨迹进行聚类，获得每一条道路对应的轨迹簇，然 后提取轨迹簇中心线，对于每个簇内的轨迹观测点不同的问题，可以对其进行重 采样，如图 3-7 所示。所获得的轨迹簇中心线可以用于轨迹合并以生成路网框架。 拟定选取一初始轨迹线为基准，然后不断将新增的轨迹线与先前聚合后的链路进 行融合，融合的过程中考虑局部曲线匹配方法来衡量轨迹和链路之间的局部相似 性，最终获得路网的整体骨架结构。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.039.png"></p>
+<p>图 <strong>3-7</strong> 轨迹数据的路网中心线提取</p>
+<p>车道信息提取拟采用基于高斯混合模型的方法。首先利用上一步提取的道路 中心线获得道路的主方向（记为 Y），进而可以得到与 Y 垂直的道路横截面方 向（记为 X），如图 3-8 所示。然后将轨迹数据投影到 X 方向上，可以获得轨迹 数据在道路横向的分布，如图 3-9 所示。对于轨迹的横向分布可以采用高斯混合 模型进行车道信息提取。传统的高斯混合模型需要人工设定混合的数量即车道数 量，本项目引入车道宽度的先验知识，可以自动选择最优的车道数量如图 3-10 所示，在确定车道数量之后，采用传统的高斯混合模型识别车道的中心线，如图 3-11 所示。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.040.png"></p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.041.jpeg"></p>
+<p>图 <strong>3-8</strong> 轨迹数据道路横截面方向检测</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.042.jpeg"></p>
+<p>图 <strong>3-9</strong> 轨迹数据的道路横向分布</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.043.jpeg"></p>
+<p>图 <strong>3-10</strong> 基于高斯混合模型选择的车道数量识别</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.044.jpeg"></p>
+<p>图 <strong>3-11</strong> 高斯混合模型拟合检测车道中心线</p>
+<ol start="3">
+<li>交叉口区域路网信息提取</li>
+</ol>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.045.jpeg"></p>
+<p>图 <strong>3-12</strong> 交叉口区域路网信息提取流程</p>
+<p>交叉口区域路网信息提取分为三个步骤包括交叉口位置检测，范围及类型检 测和拓扑信息识别，如图 3-12 所示。</p>
+<p>交叉口位置检测提取的目标是交叉口的中心坐标，首先从轨迹数据中提取转 向点，可以基于偏航角识别，如图 3-13 所示，然后对转向点进行聚类分析，确 定交叉口中心位置的初步估计。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.046.jpeg"></p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.047.png"></p>
+<p>图 <strong>3-13</strong> 交叉口区域轨迹偏航角分布</p>
+<p>在确定交叉口的中心位置之后，通过提取交叉口中心一定范围内的轨迹点的 分布，构建形状描述子特征，如图 3-14 所示的偏航角分布，然后基于特征匹配 的方式可以确定交叉口的范围以及类型。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.048.jpeg"></p>
+<p>图 <strong>3-14</strong> 不同区域的轨迹偏航角分布</p>
+<p>交叉口拓扑信息识别拟采用的方法包括对交叉口范围内的轨迹段进行过滤， 然后进行聚类分析，识别的轨迹聚类簇代表交叉口各路口之间的一对转向信息。 依据交叉口聚类簇之间转向角度的差异识别交叉口转向出入口簇的转弯方式（左 转、右转和直行），进而对不同转弯方式的轨迹段进行分析，推理出转弯规则的 限制，如图 3-15 所示。</p>
+<p>利用长安轨迹数据记录的高程信息还可以对轨迹数据提取的拓扑信息进行 修正，如图 3-16 所示。图中三条轨迹在二维平面上存在相交关系，但是通过其 高程信息得到轨迹 A 其实是属于高架桥跨越轨迹 B 和 C，因为其交点并不应该 被设计为一个路网节点，因此，采用高程信息可以提升拓扑信息的准确度。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.049.jpeg"></p>
+<p>图 <strong>3-15</strong> 交叉口轨迹聚类</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.050.jpeg"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.051.png"></p>
+<p>图 <strong>3-16</strong> 基于高程信息的轨迹数据拓扑信息修正</p>
+<ol start="2">
+<li><p>研究内容</p>
+</li>
+<li><p>轨迹数据预处理</p>
+</li>
+<li><p>针对的主要问题 轨迹数据的空间精度和完整度对高时空精度的道路测图具有重要影响。在轨 迹数据采集过程中，受 GPS 本身的误差、GPS 信号受遮挡变弱等因素的影响， 可能导致采集的数据不准确、数据丢失等情况：如采集者位置保持不变，速度却 不为 0；有些速度值异常高或异常低；还有的轨迹点定位坐标存在误差，远离路 网。</p>
+<p>项目数据集中存在某些数据文件具有较多异常点图 3-17，因而需要进行异常 点的识别和去除。异常点除在位置信息上可能存在跳变外，时间戳信息往往也存 在跳变。</p>
+</li>
+</ol>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.052.jpeg"></p>
+<p>图 <strong>3-17</strong> 数据文件中存在异常点（异常点在图框之外）</p>
+<p>位置信息异常的轨迹点可能与真实轨迹偏差很大，也有可能与真实轨迹偏差 很小如图 3-18，此类转角异常轨迹点不能仅根据位置信息或速度阈值进行清洗， 因而需要对上述流程结果进行进一步的清洗。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.053.png" alt="ref1"></p>
+<p>图 <strong>3-18</strong> 转角异常轨迹点</p>
+<p>为了降低异常数据的影响，需要对轨迹数据进行预处理，识别和修复错误或 丢失的数据，并根据具体的应用场景，在降低数据量的同时保证压缩后的数据与 原来数据之间的高度相关性，是高精度道路众包测图的数据支撑。</p>
+<ol start="2">
+<li>轨迹预处理</li>
+</ol>
+<p>（<strong>1</strong>） 基于运动特征的轨迹清洗</p>
+<p>从轨迹数据的基本信息（x,y,t）出发，提取各轨迹点的运动特征：</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.054.png"></p>
+<p>代表轨迹点， , , 三元组描述轨迹点的经度，纬度，时间戳信息。 <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.055.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.056.png" alt="ref2">代表方向角， 代表转角， 代表距离， 代表时间间隔， 代表速度。选择转 角、距离、时间间隔、速度四个运动特征，采用开源数据集，某一轨迹提取结果 如下（图中红色区域对应漂移点）：</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.057.png"></p>
+<p>图 <strong>3-19</strong> 运动特征提取</p>
+<p>基于转角、距离、时间间隔和速度四个特征，进一步可以提取得到各轨迹点 的时序特征，对于一个运动特征而言，时序特征即该运动特征在一定时间范围内 的波动程度，使用该运动特征的标准差进行计算。对某一轨迹进行运动特征提取， 结果如下：（特征值越接近 1,代表该时序对应的运动特征在该点附近波动性越小）：</p>
+<p>（<strong>2</strong>） 变采样轨迹压缩方法</p>
+<p>现有的道格拉斯算法与滑动窗口算法，都是基于最大垂直距离的关键点对轨 迹点进行压缩，在路网提取时，对于交叉口区域需要尽可能保留转向点，在直线 段区域需保留一定的轨迹点数量便于进行车道信息提取。</p>
+<p>为了能够对误差累计效应进行控制，可以采取的方案有：</p>
+<p>(1)对采样间隔进行限制，误差累计效应的前提是采样点间距离较大，但采 样点之间的轨迹点角度变化都维持在较小范围，限制了采样点间的最大间隔，可 以直接避免误差累计效应的产生，这种方法实现简单，对压缩后误差的限制也较 好。</p>
+<p>(2)轨迹压缩的动态采样策略主要关注点为轨迹点的偏航角变化率，当偏航 角变化率的累积值超过给定阈值时，进行新的特征点采样，使用这样的策略使得 我们可以很好地保留原始轨迹中方向变化较大的特征点，例如对于各个弯道区域 的采样间隔就会比较小。</p>
+<p>给定一条轨迹 T&#x3D;{P1，P2，…，Pn}，设点 Pi 的方位角为αi，那么相邻点 Pi+1 相对于点 Pi 的方向变化量为δ(Pi+1|Pi)，任意点 Pj（j &gt; i）相对于点 Pi 的方向变 化量为 Pi，Pi+1，…，Pj-1，Pj 中两两相邻点方向变化量的累计和。</p>
+<p>Ps 保存上一待征点的值，Pi 变量保存前一相邻点的值，对于轨迹的起点， 直接将其视为特征点，Ps 变量赋值为 P1，Pl 赋值为 P1,继续对下一轨迹点进行 压缩处理，根据推论，当前点 Pi 相对于上一特征点的累积方向变化量等于 Ps 与 Pi 的累计和，辅助缓存只需保存当前点、上一特征点 Ps。前一相邻点 Pi 以及当 前点相对于上一特征点的方向变化量，算法的时间复杂度为 0（N）。算法考虑方 向的累计变化量，处理流程较为简单，且支持实时轨迹数据流的在线压缩。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.058.jpeg"></p>
+<p>图 <strong>3-20</strong> 轨迹点之间的方向变化与方位角的关系</p>
+<p>(3)采样近似公式预测两个采样点间的连线与两个采样点间所有轨迹点组成 的轨迹之间的最大距离，实现这种方案需要算法的时间复杂度高（O（N）），即 计算采样点间连线与采样点间轨迹的最大距离的近似公式需要常量形式的时间 复杂度，由于高精度轨迹在经过轨迹清洗后具有平滑的运动特性，假设对轨迹的 局部空间分布可以用一个连续的，高阶可导的函数描述，为了简化问题的描述， 对于两个采样点 p1 和 p2，记原始轨迹数据中 p1 到 p2 直接的点组成的轨迹为 tr， 首先通过旋转变换使得 p1 到 p2 连线与 x 坐标平行，记 p1 与 x 轴正向的夹角为 θ1，p2 与 x 轴的夹角为θ2，p1 到 p2 之间的距离为 d，p1 与 p2 间的最大距离 误差为 hmax，记轨迹偏航角的变化率的阈值为λ。其中，每次采样时，θ1，θ 2，d 都可以在常量的时间复杂度下计算得到，λ已知，如图 1.1 所示。则可以构 建如下的最小值模型：</p>
+<p>max h <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.059.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.060.png"></p>
+<p>2<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.061.png"></p>
+<p>=</p>
+<p>1</p>
+<p>2</p>
+<p>&#x3D; 0</p>
+<p>1</p>
+<p>≤</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.062.png"></p>
+<p>图 <strong>3-21</strong> 约束模型示意</p>
+<p>在此约束模型下，采样点间的轨迹与采样点连线间的最大压缩误差不会超过 max(hmax)，因而若 max(hmax)大于了设定的压缩误差上限，则应该在现有的两 个采样点之间再进行采样。</p>
+<p>方法具体流程如下：</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.063.jpeg"></p>
+<p>图 <strong>3-22</strong> 变采样压缩算法流程</p>
+<ol start="2">
+<li>城市环境多类型、不同规模交叉口车道级拓扑提取</li>
+<li>针对的主要问题 作为智慧交通相关应用的基础，城市路网信息在交通规划、导航服务以及智 能驾驶等领域具有重要作用。交叉口被定义为多条道路的交汇区域，作为城市路 网的重要组成部分，结构复杂，安全事故多发，因此检测道路交叉口位置、范围， 以及构建详细的交叉口车道结构成为了智能交通领域研究的重点问题。 众包轨迹数据来源于搭载 GPS 接收模块的出行车辆，具有道路区域覆盖面 广、时效性高、成本低等优点，轨迹数据包含的的出行车辆空间位置信息，能够 反映路网信息以及交叉口位置、覆盖范围、转向模式等信息。</li>
+</ol>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.064.png"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.065.png"></p>
+<p><code> </code><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.066.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.067.png"></p>
+<p>图 <strong>3-23</strong> 传统交叉口范围识别算法参数相对固化，难以自适应城市路口，立交枢纽等不同空</p>
+<p>间覆盖的交叉口</p>
+<p>目前已有的研究在交叉口位置、范围检测方面，主要通过轨迹转向点或轨迹 分布特征，对任意形状和类型的交叉口都检测圆型的交叉口范围，受到转向轨迹 分布、驾驶行为以及噪声的影响，这类方式往往取得过大或过小的交叉口范围。 对于智能驾驶而言，检测的交叉口范围太小则存在交通安全风险，交叉口范围过 大则会降低智能驾驶系统的决策精度。</p>
+<p>交叉口内部车道结构生成方面，大部分研究只能生成道路级的交叉口路网， 无法满足智能交通系统尤其是自动驾驶系统的数据需求。部分研究通过高斯混合 模型生成车道级交叉口路网。高斯混合模型算法基于的假设为：车辆的轨迹在横 向上遵循正态分布。当频繁发生换道动作以及车道数量变化时，这种假设可能不 成立。而交叉口区域交通状况复杂，常出现轨迹转弯、变道以及车道数量变化等 情况，这一缺陷影响了高斯混合模型生成的车道级交叉口路网的准确性。</p>
+<p>针对以上问题，课题组提出了基于图的自适应转向轨迹聚类算法自适应提取 不同空间范围交叉口，提出了基于交叉口分支分界横截线检测的精准交叉口范围 提取算法，以及提出了基于 Hausdorff 距离层次聚类和主曲线拟合算法的交叉口 车道级拓扑提取算法。</p>
+<ol start="2">
+<li>城市环境多类型、不同规模交叉口车道级拓扑提取</li>
+</ol>
+<p>（<strong>1</strong>） 城市环境多类型、不同规模交叉口车道级拓扑提取算法框架</p>
+<p>应对智能交通领域获取城市交叉口信息需求，针对基于轨迹数据交叉口提取 在交叉口空间范围异质性、交叉口范围检测以及车道拓扑生成等问题，课题组开 展了自适应交叉口提取、精准交叉口范围检测以及车道级拓扑结构生成算法研究。 算法框架如图 3-24 所示。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.068.jpeg"></p>
+<p>图 <strong>3-24</strong> 交叉口车道级拓扑提取算法框架</p>
+<p>算法分为三个主要模块：</p>
+<p>基于转向段的自适应交叉口提取：基于角速度和转向时长阈值聚类提取转向</p>
+<p>轨迹段，基于图的自适应转向段聚类提取交叉口，并基于最小覆盖圆算法提 取交叉口粗范围；</p>
+<p>交叉口精准范围检测：基于交叉口内部轨迹端点航向聚类判断交叉口形状并 检测交叉口分支，对交叉口各分支滑动横截线检测轨迹宽度变化提取交叉口分界 横截线，根据各分支分界线提取交叉口精准范围；</p>
+<p>交叉口车道拓扑构建：计算轨迹间 Hausdorff 距离，采用凝聚层次聚类得到 不同车道以及不同转向行为轨迹簇，采用主曲线拟合算法同一簇的轨迹拟合生成 车道中心线，得到交叉口内部车道拓扑结构。</p>
+<p>（<strong>2</strong>） 基于转向段的自适应交叉口提取</p>
+<p>作为城市路网的重要组成部分，车辆行进方向变换是道路交叉口的一个重要 功能，在交叉口处，车辆可以从一个方向的道路移动到另一方向的道路上，与普 通路段相比，转向轨迹会更多集中在交叉口附近。因此课题组通过提取轨迹数据 中的转向轨迹段来检测交叉口，同时研究图的自适应转向段聚类算法来提取不同 规模交叉口。</p>
+<p>算法步骤包括：通过基于角速度和转向时长阈值聚类提取转向轨迹段；通过 基于图的自适应聚类算法聚类转向轨迹段；采用最小覆盖圆算法提取圆形候选交 叉口粗范围。</p>
+<p>转向点检测：计算每个轨迹点航向变化角速度，以角速度大于一定阈值的轨 迹点作为转向点。航向角速度计算公式为：</p>
+<p>Δθi &#x3D; θi − θi−1 + 180∘ \ mod360∘ − 180∘ <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.069.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.070.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.071.png"></p>
+<p>Δθ ω &#x3D;</p>
+<p>Δ</p>
+<p>提取转向轨迹段：将每条轨迹中的转向点序列采用均值漂移聚类算法以筛选 出连续的转向点构成转向轨迹段，计算转向轨迹段前后角度变化值以及持续时间， 保留角度变化和持续时间都大于一定阈值的转向转向轨迹段。</p>
+<p>基于图的自适应聚类算法：</p>
+<p>1)计算距离矩阵：对已提取的非 U-turn 转向轨迹段，计算每对转向段间最小 距离以及最大距离，分别构建最小距离矩阵以及最大距离矩阵；</p>
+<p>2)构建图：根据最小距离矩阵以转向段间最小距离作为边权值，构建完全连 接图，并生成最小生成树；</p>
+<p>3)聚类区域初始化：每个节点都作为一个独立的集群；</p>
+<p>4)集群合并：按照权重从小到大遍历每一条边，如果两个节点分属不同的集 群，且边的权重小于两个区域的内部差异+规模阈值函数，则将这两个区域合并 为一个区域：</p>
+<p>( 1, 2) &lt;&#x3D; ( ( 1) + ( 1), ( 2) + ( 2), ) 其中：</p>
+<p>Dif(C1, C2) 两分量间的最短边距离；</p>
+<p>Int(C) 分量内部的最大距离；</p>
+<p>minDis 固定邻近距离（如 10m），用于算法初始轨迹聚类；</p>
+<p>τ(C) 代表该分量空间范围的阈值函数：</p>
+<p>τ(C)&#x3D;k*max(Dis_Far)</p>
+<p>k 为可调节参数，max(Dis_Far)表示该集群内部轨迹间最远距离，通过此前</p>
+<p>得到的最大距离矩阵计算，用以表示集群空间范围。</p>
+<p>最终完成遍历，聚类转向段得到候选交叉口。 算法步骤如图 3-25 所示</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.072.jpeg"></p>
+<p>图 <strong>3-25</strong> 基于图的自适应转向段聚类算法</p>
+<p>转向轨迹段聚类簇，通过基于 Welzl 算法的最小覆盖圆算法提取聚类轨迹簇 的最小覆盖圆，再外扩 10m 作为交叉口圆形粗范围。</p>
+<p>（<strong>3</strong>） 交叉口精准范围检测</p>
+<p>对于智能驾驶系统而言，检测的交叉口范围小于实际范围则存在交通安全风 险，交叉口范围过大则会降低智能驾驶系统的决策精度。根据交叉口的转向功能， 与普通路段相比，进入交叉口时车辆轨迹会出现直行或转向的不同行进方式，因 而车辆轨迹在交叉口边界位置会出现发散特征，如图 3-26 所示：</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.073.jpeg"></p>
+<p>图 <strong>3-26</strong> 交叉口精准范围</p>
+<p>因此通过检测交叉口各分支轨迹收敛位置提取交叉口精准范围。</p>
+<p>算法步骤包括：检测候选交叉口道路分支并判断交叉口形状；对交叉口各道 路分支，滑动横截线检测轨迹外扩位置作为分界线；各分支分界横截线构建凸多 边形提取交叉口精准范围。</p>
+<p>交叉口道路分支检测以及交叉口形状判断：</p>
+<p>提取交叉口内部轨迹端点，计算轨迹端点相对交叉口中心修正航向角，对修 正航向角聚类并判断交叉口形状。</p>
+<p>轨迹端点相对交叉口中心修正航向角计算：提取交叉口内部轨迹端点，去除 距离圆形边界较远端点以降低断开轨迹影响。对每个端点，计算交叉口中心到端 点向量方位角，计算该方位角与端点航向差值，如果差值在 180°左右，则取该 端点的反向航向角作为修正后的航向角。</p>
+<p>端点航向角聚类：使用均值漂移聚类算法对每个候选交叉口端点修正航向角 的正余弦分量进行聚类。针对可能存在的噪声轨迹，设置聚类每簇最少点数以减 少噪声轨迹影响。</p>
+<p>正余弦分量的计算公式为：</p>
+<p>θi <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.074.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.075.png">sinθ &#x3D; sin 2π</p>
+<p>i 360</p>
+<p>θ<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.076.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.077.png"></p>
+<p>cosθ &#x3D; cos 2π i</p>
+<p>i 360 根据聚类簇数以及各簇方向判断交叉口形状以及分支数，剔除道路分支数在</p>
+<p>3 以下的候选交叉口（通常为误检测的弯道路段）。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.078.jpeg"></p>
+<p>图 <strong>3-27</strong> 不同交叉口检测</p>
+<p>交叉口在各道路分支处精准分界横截线检测：</p>
+<p>对于交叉口各道路分支，计算分支端点修正航向角中位数作为分支主方向， 在端点处取垂直分支主方向并向两侧外扩到轨迹线范围外 10m 作为初始轨迹横 截线；将初始横截线向交叉口中心方向滑动，计算轨迹在横截线上分布宽度变化 序列。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.079.png"></p>
+<p>图 <strong>3-28</strong> 轨迹宽度变化序列</p>
+<p>在宽度变化序列上滑动一定带宽的窗口，采用 MK 趋势检测算法检测是否有 轨迹变宽趋势，基于 Theil-Sen 斜率估计算法计算宽度变化斜率，取滑动时第一 个轨迹变宽趋势显著且斜率估计大于一定阈值位置作为交叉口与非交叉口分界 位置，取滑动到分界位置处的横截线作为这一道路分支处交叉口与非交叉口分界 线。如图 3-29 所示</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.080.jpeg"></p>
+<p>图 <strong>3-29 MK</strong> 趋势检测</p>
+<p>MK 趋势检测算法步骤如下：</p>
+<p>a.计算排名：在滑动窗口内对于每个轨迹宽度值从小到大构建排名；</p>
+<p>b.计算 S 统计量：对于每一对轨迹宽度值，计算其值之间的差异，并计算 大于 0 的差异的数量 P 和小于 0 的差异的数量 Q。然后，计算 S 统计量， 即 S &#x3D; P - Q。</p>
+<p>c.计算 V 统计量：计算 V 统计量，即 &#x3D; ，其中 Var(S) 是 S 统<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.081.png"></p>
+<p>( )</p>
+<p>计量的方差。</p>
+<p>d.判断趋势显著性：根据 V 统计量的值，使用正态分布计算 p 值，若 p &lt; 0.05，则增长趋势显著，说明这个滑动窗口内轨迹宽度为增长趋势。</p>
+<p>Theil-Sen 斜率估计算法步骤为：对于滑动窗口内的数据，计算每个数据点 到其下一点的斜率，对滑动窗口内所有点斜率进行排序，取中位数作为 Theil-Sen 斜率估计。</p>
+<p>对于每个交叉口，提取每个出入口处交叉口与非交叉口分界横截线后，采用 凸包算法从分界横截线端点集中构建凸多边形，作为交叉口准确范围。如图 xx 所示：</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.082.jpeg"></p>
+<p>图 <strong>3-30</strong> 分支范围检测</p>
+<p>（<strong>4</strong>） 交叉口车道拓扑结构生成</p>
+<p>交 叉 口 内 部 轨 迹 聚 类 方 法 包 括 ： 提 取 交 叉 口 范 围 内 的 轨 迹 ， 计 算 轨 迹 间 Hausdorff 距离，采用凝聚层次聚类，设置单链接的链接准则，以及簇间距离最 小距离阈值，层次聚类得到不同车道以及不同转向行为轨迹簇。</p>
+<p>Hausdorff 距离计算方法如下：</p>
+<p>对于轨迹点构成的轨迹 A&#x3D;{a1,a2,…,am}与 B&#x3D;{b1,b2,…,bn}，A、B 之间的 Hausdorff 距离为：</p>
+<p>( , ) &#x3D; (ℎ( , ),ℎ( , )</p>
+<p>其中，</p>
+<p>ℎ( , ) &#x3D; { <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.083.png"> − }<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.084.png"></p>
+<ul>
+<li>∈</li>
+</ul>
+<p>ℎ( , ) &#x3D; { <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.085.png"> − }<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.086.png"></p>
+<ul>
+<li>∈</li>
+</ul>
+<p>‖·‖为点 a 与点 b 之间的距离 如图 3-31 所示：</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.087.png"></p>
+<p>图 <strong>3-31 Hausdorff</strong> 距离</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.088.png"></p>
+<p>图 <strong>3-32</strong> 层次聚类</p>
+<p>在层次聚类基础上，利用主曲线拟合方法将聚类为同一簇的轨迹采用主曲线 拟合算法拟合生成车道线，从而得到交叉口内部车道中心线。</p>
+<p>主曲线拟合算法步骤如下：</p>
+<p>1)随机选取属于同一对出入口的轨迹中的一条轨迹线作为初始车道线；</p>
+<p>2)对初始车道线的每个点计算横截面线；</p>
+<p>3)计算横截面线与输入轨迹簇交点的几何中心，将几何中心作为车道的中心 点，连接各交点，更新拟合车道中心线；</p>
+<p>4)迭代前两步，至中心点的位置稳定不变为收敛条件，得到最终拟合结果。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.089.jpeg"></p>
+<p>图 <strong>3-33</strong> 主曲线拟合</p>
+<ol start="3">
+<li>道路结构变化场景车道几何信息提取技术</li>
+<li>针对的主要问题 目前，大多数现有的地图推断方法都致力于生成道路级别网络，缺乏考虑车 道级别信息（如车道数量、车道宽度和车道几何形状），以及平行车道、立交桥、 地下道和十字路口等复杂道路场景。从高精度轨迹数据生成车道级别的道路网络 主要面临两个挑战。首先，车道级别的拓扑结构通常比道路级别更加复杂，车道 结构的复杂性来自于错综复杂的布局和连接性，包含合并和分离车道的存在。第 二个挑战在于高精度轨迹数据中不确定的驾驶模式，车道变换行为导致轨迹连接 平行车道，这可能干扰依赖于轨迹连接的常规道路网络生成过程中的车道拓扑推 断。总而言之，从高精度轨迹数据中准确推断车道级信息是一项具有挑战性的任 务，原因在于复杂的车道分歧合流结构以及轨迹数据中广泛存在的换道行为模式。</li>
+</ol>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.090.png"></p>
+<p>图 <strong>3-34</strong> 现有车道几何信息提取方法（聚类，高斯混合模型），对样本数据量有一定要求且较</p>
+<p>难处理换道轨迹</p>
+<p>如图所示，在真实的交通场景下车辆可能会频繁变换车道，这使得计算成对 轨迹之间的有效距离依然存在挑战性，同时基于概率分布计算车道中心的方法对 样本数据量有一定要求且较难处理换道轨迹。</p>
+<p>为此，课题开发了道路结构变化场景车道几何信息提取算法，克服在车道分 布较为复杂的道路结构变化场景以及轨迹数据中车辆频繁换道影响下的车道提 取难点，实现准确生成车道级别的道路网络。针对车道恒定区域和车道变化区域 下的不同数据分布特征，设计了车道轨迹聚类，车道中心线拟合，车道拓扑构建</p>
+<p>等一系列算法，覆盖了车道信息提取完整流程，提高了车道几何信息提取的整体 精度和不同道路场景下的算法适应性。</p>
+<ol start="2">
+<li>道路结构变化场景车道几何信息提取算法整体框架</li>
+</ol>
+<p>（<strong>1</strong>） 车道几何信息提取算法需求分析</p>
+<p><strong>1</strong>） 轨迹数据预分区需求</p>
+<p>在处理大规模的轨迹数据时，需要以路段为单位对轨迹数据进行预分区。这 意味着将轨迹数据按照路段进行划分和组织，以提高处理效率和减少计算复杂度。 预分区的目的是使轨迹数据在每个路段内聚集，并且相邻路段之间有合适的重叠 区域。这样可以确保在处理每个路段时，所需的数据量较小且相关性较高。</p>
+<p><strong>2</strong>） 车道结构变化区域检测需求</p>
+<p>为了提取准确的车道几何信息，需要设计算法来检测车道结构发生变化的区 域，如车道分歧、合流等。这需要分析轨迹数据中的关键特征，如轨迹的横向距 离分布等，以识别潜在的车道结构变化。检测算法应具备高准确性和鲁棒性，能 够处理不同的道路场景和复杂的变化情况。通过准确检测车道结构变化的区域，</p>
+<p>可以为后续的车道几何信息提取提供准确的数据基础。</p>
+<p><strong>3</strong>） 车道几何信息准确提取需求</p>
+<p>为了生成准确的车道级别道路网络，需要设计算法来准确提取车道的几何信 息，包括车道边界和中心线。这需要处理车道恒定区域和车道变化区域的不同数 据分布特征。算法应能够识别车道边界的形状和位置，并拟合车道的中心线，以 获得车道的几何属性和位置信息。提取算法应具备高精度和鲁棒性，能够处理复</p>
+<p>杂的车道结构和数据噪声，以生成准确的车道几何信息。</p>
+<p><strong>4</strong>） 轨迹换道行为处理需求</p>
+<p>高精度轨迹数据中存在不确定的驾驶模式，车道变换行为导致轨迹连接平行 车道，干扰了常规道路网络生成过程中的车道拓扑推断。在轨迹数据中存在换道 行为时，需要设计相应的处理方法。这些方法应能够识别和处理轨迹数据中的换 道行为，包括换道时机和位置的识别，并将其纳入车道几何信息的提取过程中。 处理方法应考虑不同的换道模式和驾驶行为，以获得准确的车道信息和拓扑结构。</p>
+<p>通过处理轨迹换道行为，可以提高车道几何信息提取的准确性和完整性。</p>
+<p><strong>5</strong>） 车道级拓扑信息构建需求</p>
+<p>基于提取的车道几何信息，需要构建车道级别的拓扑信息。这包括车道之间 的连接关系、拓扑结构和车道的拓扑属性。拓扑信息的构建应考虑车道的邻接关 系、分叉口的拓扑结构，以及车道之间的和转换关系。构建的拓扑信息应具备准</p>
+<p>确性和完整性，能够反映实际道路网络的拓扑关系和行车规则。</p>
+<p>（<strong>2</strong>） 车道几何信息提取总体算法框架设计</p>
+<p>课题设计的车道几何信息提取总体算法框架如图 3-1 所示。算法首先基于道 路网络结构特征采用了分而治之的策略，通过对轨迹进行分区来进行处理。轨迹 分割是基于识别车道变化结构进行的，从而将路段轨迹划分为车道一致区域和车</p>
+<p>道变化区域。接下来，根据车道一致区域和车道变化区域的特点，设计了专门的 车道生成算法。包括以下步骤：</p>
+<ol>
+<li>数据预处理。该步骤通过定位交叉口来进行轨迹分区，并将轨迹分组为代表 不同道路段的聚类。</li>
+<li>基于车道结构变化识别的轨迹分割。该步骤识别车道转换结构，将轨迹分割 为车道一致区域和车道转换区域。</li>
+<li>车道一致区域中的车道生成。对于车道一致区域，通过轨迹聚类来识别车道， 并开发了一种基于轨迹的主曲线拟合算法来提取车道中心线。检测和修剪由 自主换道行为引起的错误车道中心线。</li>
+<li>车道转换区域中的车道生成。开发了一种车道组拟合算法，通过估计车道位 置和构建车道转换的拓扑和几何结构来提取车道转换结构。</li>
+</ol>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.091.jpeg"></p>
+<p>图 <strong>3-35</strong> 车道几何信息提取总体算法框架设计</p>
+<ol start="3">
+<li>车道几何信息提取算法功能模块设计</li>
+</ol>
+<p>（<strong>1</strong>） 轨迹数据预分区</p>
+<p>轨迹数据预处理步骤将原始的长距离轨迹进行分割，以降低道路网络构建的 复杂性，避免表示复合道路结构。在之前的交叉口提取步骤中，道路交叉口被视 为分割的多边形边界，基于此本模块将测试区域划分为表示道路交叉口和道路段 的区域。以道路交叉口为间隔，原始轨迹被分割为子轨迹。每个道路段的子轨迹 从一个交叉口边界开始，直到另一个相邻边界结束。为了高效地将对应于每个道 路 段 的 子 轨 迹 进 行 分 组 ， 根 据 基 于 子 轨 迹 的 起 点 和 终 点 位 置 采 用 OD(origin-destination)点对聚类，将所有子轨迹划分为不同路段的轨迹集合。子 轨迹的起点和终点能够快速有效地确定轨迹的所在空间位置，通过计算子轨迹的 起点－终点对之间的距离和，进行 DBSCAN 聚类，使得空间位置相近且分布较 为密集的子轨迹聚为一簇。具体聚类过程包括以下步骤：</p>
+<p>首先，将每个子轨迹初始化为独立的聚类，然后计算每对聚类之间的距离相 似度，使用其起点-终点(OD)对之间的欧氏距离。接下来，将最接近的两个聚类 合并为一个新的聚类，并重新计算新聚类与其他聚类之间的距离相似度。迭代地 合并最接近的聚类，直到它们超过设定的距离阈值 100 米，该阈值经验性地定义 为区分不同道路段的阈值。最终获取属于不同路段的轨迹集合。属于同一路段的 轨迹集合将作为后续车道几何信息提取算法的输入。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.092.jpeg"></p>
+<p>图 <strong>3-36</strong> 轨迹数据预分区</p>
+<p>（<strong>2</strong>） 基于车道结构变化识别的轨迹分割处理模块</p>
+<p>车道变换结构是车道级道路网络中的重要组成部分，它们涉及车道的合并或 分离，并对拓扑结构产生影响。本节介绍一种基于车道变化结构进行车道组分割 的方法，该方法以非交叉口区域的各路段轨迹集合作为输入，基于轨迹路段横向 距离分布序列来识别道路段内的车道变换结构，并将轨迹分割为车道一致区域和 车道变换区域。如图 3-37 所示为基于车道变化结构进行车道组分割的示意图。</p>
+<p>为了预先识别变道区域，首先将观测轨迹点投影到 Frenet 坐标系中，计算轨 迹距离道路中心线的横向和纵向距离分布。Frenet 坐标系是一种基于道路曲线的 局部坐标系，能够基于参考线的形状和相对位置提供一种直观的方式来表示轨迹 的横向和纵向距离分布。其中轨迹的横向距离是轨迹距离道路参考线的垂直距离， 轨迹的纵向距离为轨迹沿着路径的前进方向的行驶距离。首先，确定一个参考路 径。在本研究中，参考路径是道路段的中心轨迹。通过计算道路段的最外两条轨 迹之间的中心线位置，并选择与中心线位置的 Hausdorff 距离最小的轨迹来确定 中心轨迹。参考路径表示为：</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.093.png"></p>
+<p>其中(x_i,y_i)为全局坐标系中第 i 个参考点的位置，\vec{t_i}为参考点处的切向量， \vec{n_i}为参考点处的法向量，即垂直于切向量的单位向量。 接下来，对于每个轨迹点(x_t,y_t)，计算其相对于参考路径的纵向距离 s 和横向 距离 d：</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.094.png"></p>
+<p>其中 r 是参考路径上离轨迹点(x_t,y_t)最近的参考点(x_r,y_r)的索引。纵向距离 s 定义为从参考路径起点到最近参考点沿参考路径的长度。横向距离 d 是轨迹点到 参考路径的有符号投影距离。当轨迹点位于参考路径的右侧时，d 为正；当轨迹 点位于参考路径的左侧时 d 为负。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.095.jpeg"></p>
+<p>图 <strong>3-37</strong> 基于车道结构变化识别的轨迹分割处理**: (a)<strong>示例路段轨迹数据</strong>; (b)<strong>轨迹数据的纵 向与横向距离分布</strong>; (c)<strong>车道恒定区域与车道转换区域的轨迹分布细节</strong>; (d)**车道结构变化点</p>
+<p>识别**;(e)<strong>轨迹分段</strong>.**</p>
+<p>如图 3-37 所示，将图(a)中路段轨迹投影至 Frenet 坐标系，x 轴坐标为轨迹 的纵向距离，y 轴坐标为轨迹的横向距离，得到如图(b)所示的分布。轨迹的横向 距离的偏移分布反映了轨迹的变道模式，可以观察到车道一致区域和车道变换区 域的特征，如图(c)所示。车道一致区域是指车道变换结构之前的区域，其中轨迹 点的横向距离变化分布相对较小。车道变换区域是指车道变换结构之后的区域， 其中轨迹点的横向距离变化相对较大。</p>
+<p>根据这些特征，我们可以将轨迹分割为车道一致区域和车道变换区域。将纵 向距离看作时间函数，横向距离的分布类比为时间序列的表示，将轨迹的车道结</p>
+<p>构变化检测问题转化为时间序列分割中的变化点检测问题，检测序列中横向距离 均值发生变化的位置。变化点检测算法可以为时间序列找到合适的变化点，使序 列基于变化点进行分割以后的误差的总和最小。对于横向距离序列 1, 2,…, <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.096.png">, 通过定义一个损失函数，在满足约束的条件下搜索所有的分割位置<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.097.png"> 1, 2,…, <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.098.png">， <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.099.png">将其表示为一个优化问题，检测所有变化位置 <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.100.png">1, 2,…, ，选择损失函数值最 <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.101.png">小的分割方法：</p>
+<p>1, 2,…, &#x3D; min 1, 2,…, <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.102.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.103.png"></p>
+<p>1, 2,…, </p>
+<p>式中， 1, 2, …, 为损失函数，具体表示如下：<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.104.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.105.png"></p>
+<p>+1−1</p>
+<p>2 <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.106.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.107.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.108.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.109.png">1, 2,…, &#x3D; − … +1</p>
+<p>&#x3D;0 &#x3D;</p>
+<p>式中，K 为变化点的数量， … +1是分段后的各分段序列的平均值， <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.110.png">−</p>
+<p>… +1<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.111.png">2为样本值与样本均值之间的误差平方和，当一组数据分布越平稳，其误</p>
+<p>差平方和越小。</p>
+<p>通过选取最小化总偏差平方和，确定变化点的数量和位置，对路段轨迹进行 分割，通过轨迹序列分段将同一路段内的数据划分为不同结构的车道组，使分割 后车道组内部拓扑结构恒定。并在相邻车道组之间预留一段 80 米的区域，作为 后续相邻车道组之间拓扑连接的变道区域。从而最终输出属于各车道组的轨迹和 相邻车道组之间的变道区域。基于车道变化结构进行车道组分割，使分割后车道 组内部拓扑结构恒定，并预留车道组之间的车道数变化区域便于进行后续的变道 拓扑连接，能够更好地服务于下游的车道信息提取任务。</p>
+<p>（<strong>3</strong>） 针对车道恒定区域的车道提取模块</p>
+<p>在车道一致区域，高精度的轨迹数据呈现出聚类模式，有助于车道识别。然 而，自由变道行为可能导致拓扑不准确。基于此，我们提出了一种车道生成方法 用于车道一致区域。该方法首先通过基于车道的轨迹聚类和基于轨迹的主曲线拟 合生成车道中心线。然后通过修剪由自由变道行为引起的错误车道中心线。</p>
+<p><strong>1</strong>） 车道轨迹聚类</p>
+<p>车道提取的初始步骤是将通过特定车道的轨迹进行聚类。在高精度轨迹数据 中，轨迹往往在特定车道上呈现出聚类模式。车道聚类是通过基于距离相似性对 轨迹进行聚类，形成车道聚类。哈斯多夫距离用于测量两条轨迹之间的距离相似 性，通过计算一条轨迹上的每个点与另一条轨迹上最近点之间的距离来定义，其 中距离最大的距离被定义为哈斯多夫距离。以属于同一路段的子轨迹集合作为输 入，采用基于轨迹层次聚类算法进行车道轨迹聚类，将同一路段的子轨迹集合进 一步划分为不同的车道，从而提取属于各车道的轨迹簇。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.112.jpeg"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.113.jpeg"></p>
+<p>图 <strong>3-38</strong> 车道轨迹聚类 具体实现方法如下：首先将路段中的每个轨迹段初始化为一个簇，并计算每</p>
+<p>对轨迹之间的豪斯多夫距离，该距离度量的计算考虑了轨迹序列的完整的分布， 根据公式：</p>
+<p>ℎ<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.114.png" alt="ref3"> , <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.115.png"> &#x3D; <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.116.png"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.117.png"> , , <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.118.png"> , <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.119.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.120.png"></p>
+<p>, &#x3D; maxmin − <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.121.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.122.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.123.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.124.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.125.png"></p>
+<ul>
+<li>∈</li>
+</ul>
+<p>, &#x3D; maxmin − </p>
+<ul>
+<li>∈</li>
+</ul>
+<p>式中，A 与 B 为包含一系列有序 GPS 观测点的轨迹， ℎ , 表示轨迹 A 与轨迹<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.126.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.127.png"> B 之间的双向豪斯多夫距离， , 表示轨迹 A 到轨迹 B 的单向豪斯多 夫距离，其计算方式为对<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.128.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.129.png"> A 中每个点 a 计算轨迹 B 中离此点最近的点 b，计算两 点之间的距离，取该距离中的最大值作为 , 的值，同理可得轨迹 B 到轨迹 A 的单向豪斯多夫距离<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.114.png" alt="ref3"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.130.png"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.131.png">, 。最终 ℎ , <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.132.png">取 , <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.133.png">和 , 中的最大值。<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.134.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.135.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.136.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.056.png" alt="ref2"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.137.png"></p>
+<p>算法将距离小于距离阈值（距离阈值最优可为车道宽度）的轨迹合并为一个 新轨迹簇。合并后的簇将作为新簇，重新计算新簇和其余簇之间的距离，簇间距 离采用两轨迹之间的最大距离，直到各簇之间的距离均大于设置的距离阈值。聚 类过程在两个最近聚类之间的距离超过预定义的距离阈值时终止，该阈值表示最 大车道宽度。车道聚类结果随后用于车道中心线提取。在车道聚类过程中，跨越 一个车道进入另一个车道的自由变道轨迹被视为单独的聚类。这些轨迹在后续步 骤中被检测和修剪，以进一步优化车道提取结果。</p>
+<p><strong>2</strong>） 基于主曲线拟合的车道中心线提取</p>
+<p>从轨迹聚类中提取车道中心线可以被视为一个曲线拟合问题。现有的车道中 心线提取方法，如样条曲线和密度估计，都需要手动参数化曲线阶数或大量数据 进行估计。在本文中，我们提出了一种非参数化和自动化的车道中心线提取算法， 通过扩展主曲线的概念。主曲线定义为最好地表示多维数据集内在特征的平滑曲 线。主曲线是一种非参数化方法，通过基于附近数据点提取和迭代更新一维主成 分，直到达到自洽状态。传统的主曲线拟合方法使用点集数据作为输入，而轨迹 数据是线性的并包含时间信息的序列，这提供了改进拟合性能的潜力。</p>
+<p>基于轨迹观测点的时序性，本课题对用于点集数据拟合的传统主曲线算法进 行改进，设计了一种适用于轨迹数据迭代优化的非参数化曲线拟合方法，以非参 数化曲线的形式对同一簇内的轨迹子集，有序提取轨迹的几何中心来提取表示车 道中心线的曲线。</p>
+<p>如图 3-39 所示为车道中心线迭代优化拟合示意图，图中，(a) 随机选取一条 轨迹线作为初始车道线；（b）对初始车道线的每个点计算横截面线；（c）计算横 截面线与输入轨迹簇交点的几何中心，将几何中心作为车道的中心点，连接各交 点，更新拟合车道中心线；（d）迭代前两步，计算当前迭代中中心线与上一次迭 代中的中心线之间的距离，当距离低于预定义阈值时，认为达到收敛状态，得到 最终拟合结果。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.138.jpeg"></p>
+<p>图 <strong>3-39</strong> 车道中心线迭代拟合算法**: (a)<strong>初始车道中心线选取</strong>; (b)**横截线与轨迹的交点计</p>
+<p>算**;(c)<strong>交点的几何中心作为更新车道中心线</strong>;(d)<strong>迭代拟合输出车道中心线</strong>.**</p>
+<p><strong>3</strong>） 轨迹换道行为识别与剔除</p>
+<p>轨迹的车道变换行为在各种驾驶场景中经常发生，原因包括超车和合作驾驶 等。主观车道变换轨迹可能导致连接平行车道的路径不正确和拓扑错误。为了适 应高精度轨迹数据中记录的车道变换行为引入的额外复杂性，课题提出了一种新 的算法，通过检测和修剪由主观车道变换行为引起的错误车道中心线，从而改善 提取的车道。</p>
+<p>基于实际车道之间通常不相交的特征和图论算法的启发，我们将车道变换检 测问题形式化为最大团问题（Maximum Clique Problem，MCP）。MCP 是指找到 一个最大团，即图中可能的完全子图中最大的那个，其中子图中的每个顶点都与 子集中的其他顶点相连。算法将非变道的基本车道中心线选取问题转换为求解图 论中的最大团问题。</p>
+<p>如图 3-40 所示为本示例性实施例中基于最大团的变道识别和基本车道线提 取方法示意图，图中：</p>
+<p>（a）为候选车道中心线，图中 A, B, C, D, E, F, G 分别表示各候选车道中心线 的编号，基于提取出的候选车道中心线构建车道线相交关系图；</p>
+<ul>
+<li>b） 为 车 道 线 相 交 关 系 图 ， 各 候 选 车 道 线 被 定 义 为 图 中 的 节 点 V &#x3D;</li>
+</ul>
+<p>A, B, C, D, E, F, G ,节点之间的边表示车道之间相交关系，如果两条车道线之间不 相交则边相连，由此构建一个无向图；<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.139.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.140.png"></p>
+<p>（c）为基本车道中心线识别，为提取互不相交的车道中心线集合 <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.141.png">, , , <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.142.png"> 作为提取出的基本车道线结果；</p>
+<p>（d）为对应的最大团识别结果，方框内为图的最大团结果，包含互不相交<br>的基本车道线节点 A, B, C, D，图中其余节点 E, F, G 则视为变道线被剔除。通过 对无向图中的最大团识别提取出互不相交基本车道中心线，并高效地剔除变道线。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.143.jpeg"></p>
+<p>图 <strong>3-40</strong> 基于最大团的变道识别算法**: (a)<strong>候选车道中心线</strong>; (b)**基于最大团的变道识别剔除后</p>
+<p>的车道中心线**; (c)<strong>车道中心线相交关系图</strong>.**</p>
+<p>算法采用如下基于最大团的变道识别算法构建无向图，基于车道中心线识别， 提取互不相交的车道中心线集合。</p>
+<p>将 每 个候 选 车 道 线定 义 为 图 的顶 点 集 V &#x3D; 1,…, ， 节 点之 间 的 边 集 E ⊆<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.144.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.145.png"></p>
+<p>× 表示车道之间相交关系，如果两条车道线之间不相交，则这两个车道线所</p>
+<p>表示节点之间的边相连。G &#x3D; , 为顶点集 V &#x3D; 1,…, 和边集 E ⊆ × 的无 <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.146.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.147.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.148.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.149.png">向图。如果子集 U ∈ V 且对于其中任意两个顶点 , ∈ ，有 , ∈ ，则称 U 是<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.150.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.151.png"> G 的完全子图。如图 5 所示，(a)中候选车道线 A,B, C, D, E, F, G 分别被定义 为图的顶点集 V &#x3D; A, B, C, D, E, F, G 。以车道线 A 为例，车道线 A 与车道线 B, C, D,<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.152.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.153.png"> F, G 之间不相交，则分别构造对应的无向边(A,B),(A,C),(A,D),(A,F),(A,G)。以 此类推，得到(b)中所示的车道相交关系图。图的最大团是指图中的最大完全子 图。求解最大团得到互不相交的基本车道线集合 , , , ，如(c)中所示作为非 变道的基本车道线进行保留。(d)中方框内为图中的最大团，图中其余节点<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.154.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.155.png"> E, F, G 则视为变道线被剔除。</p>
+<p>考虑到更复杂的在同时存在多个最大团的情况时，本实施例加入更多的轨迹 几何特征进行判断。基于轨迹偏航角的平均变化情况衡量车道线的可能发生变道 的程度，并引入节点权重属性，通过负对数函数变换使得轨迹偏航角平均变化越 小的车道线权重越大，轨迹偏航角平均变化越大的轨迹权重越小，根据公式：</p>
+<p>−1 <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.156.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.157.png"></p>
+<p>1 weight &#x3D;− log ∆ </p>
+<ul>
+<li><p>1 </p>
+<p>&#x3D;1</p>
+</li>
+</ul>
+<p>计算节点权重 weight。式中 n 表示节点所表示车道线的轨迹点总数，∆ 表示轨迹偏航角的平均变化。</p>
+<p>该算法通过引入节点权重属性从而转化为最大权重团问题，当存在多个最大 团的情况时，将选取车道线节点的权重之和最大的集合作为非变道的基本车道线。</p>
+<p>（<strong>4</strong>） 针对车道转换区域的车道提取</p>
+<p>在车道级道路网络生成中，提取车道变化结构是一个关键且具有挑战性的问 题。先前的车道提取算法通常基于车道结构一致的假设。然而，在现实世界中， 车道变化结构常常发生在车道合并或分离时，导致车道结构发生变化。为了提取 车道变化结构，我们开发了一种车道组拟合算法，该算法估计车道关键位置并构 建拓扑和几何连接关系。</p>
+<p>该算法将空间上邻近但车道数不同的车道组视为相邻的。图 3-41 以具有多 个车道变化的弯道匝道段为例，示例了车道组拟合算法的过程。我们首先进行分 割步骤，将这些结构分割并形成具有相似车道结构的车道组，提取车道变化结构 的步骤包括：</p>
+<ol>
+<li>车道变化关键位置估计：该步骤引入车道宽度先验知识的高斯混合模型 来进行起始和终止节点的车道位置估计。</li>
+<li>车道转换区域拓扑与几何构建：该步骤基于轨迹流信息构建相邻车道之 间的拓扑连接关系，并通过在 Frenét 坐标系中进行空间投影，构建车道 变化几何，以确保结构的适当和平滑变化。</li>
+</ol>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.158.jpeg"></p>
+<p>图 <strong>3-41</strong> 针对车道变化区域的车道组拟合算法 <strong>(a)<strong>以复杂匝道的轨迹数据为例</strong>; (b)<strong>车道组 分割</strong>; (c)<strong>车道关键位置识别</strong>; (d)<strong>车道转换拓扑构建</strong>;(e)<strong>车道转换几何构建</strong>;(f)<strong>车道提取结果</strong>.</strong></p>
+<p><strong>1</strong>） 车道变化关键位置估计</p>
+<p>现有的高斯混合模型（Gaussian Mixture Model，GMM）被用于车道位置估 计，并结合各种假设和参数约束进行了拓展。然而，这些约束使得参数估计在车 道转换区域等复杂场景中变得复杂和难以处理。本课题优化了 GMM 中复杂的参 数约束，并融入可变车道宽度的先验知识，以提高车道位置估计的鲁棒性。</p>
+<p>采用的先验高斯混合模型对路段两端的车道数进行识别具体包括：结合 GPS 轨迹数据分布规律，轨迹点在道路横截面上的投影分布具有聚集在各车道中心线 周围，然后向车道两端逐渐变稀疏的特性。以路段的起点开始，构建矩形移动窗 口，以轨迹在路面的最大覆盖宽度为窗口的边长，检测窗口内的轨迹观测点，沿</p>
+<p>着道路的主方向逐步移动，直至路段的终点处。通过窗口内轨迹的运动方向识别 道路的主方向和与之垂直的道路横截面方向，将窗口内所有 GPS 轨迹点在道路 横截面方向上进行投影，得到数据在道路横截面方向上的投影分布，基于经典的 高斯混合模型进行建模，获取各车道中心线的位置作为高斯混合模型中各个高斯 成分的峰值 ，根据轨迹观测点在各个车道上的分布情况，对应各个高斯成分数 据分布的标准差 ，根据各车道中的轨迹数量所占比重确定高斯混合模型中各成 分分布的权重，构建高斯混合模型的概率密度函数：</p>
+<p>2<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.159.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.160.png"></p>
+<p>1 −<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.161.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.162.png"></p>
+<p>p &#x3D; −<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.163.png"></p>
+<p>2 2 2 2</p>
+<p>&#x3D;1</p>
+<p>该密度函数 p 用于表示高斯混合模型的综合概率。式中，x 表示待计算的 投影至道路横截面方向的轨迹点样本，k<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.164.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.165.png"> 为高斯混合成分的个数，j &#x3D; 1,2, …,k，</p>
+<p>表示属于各高斯成分中样本的平均值， 表示各高斯成分中样本的标准差， 为第 j 个高斯成分分布的权重，其中， 1 + 2 + … + &#x3D; 1。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.166.png"></p>
+<p>图 <strong>3-42</strong> 高斯混合模型拟合车道位置</p>
+<p>经典的高斯混合模型需要人工设定混合的数量即车道数量，通常通过赤池信 息准则和贝叶斯信息准则来确定混合模型中的算法模块个数并确定最佳拟合模 型。但是对于车道数识别的应用场景，以往的信息准则判断会出现过拟合的情况， 随着算法模块数量的增加拟合效果看似越好。为了解决过拟合所导致的混合成分 数量过多的问题，本实施例在传统的高斯混合模型的基础上引入可变车道宽度的 先验条件，优化设计车道数选取的评价函数，以提高该算法在车道数识别上的适 用性。对车道数选取的评价函数如下：</p>
+<p>R <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.167.png"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.168.png"> &#x3D;<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.169.png" alt="ref4"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.170.png" alt="ref5"></p>
+<p>1 <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.171.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.172.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.173.png" alt="ref6"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.174.png" alt="ref7"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.170.png" alt="ref5"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.169.png" alt="ref4"></p>
+<ul>
+<li><p>log + &#x3D;1 <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.175.png"></p>
+<p>−1</p>
+</li>
+</ul>
+<p>1 <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.176.png"></p>
+<p>∙ log ∆ℎ </p>
+<ul>
+<li><p>1 </p>
+<p>&#x3D;1</p>
+</li>
+</ul>
+<p>式中，对于轨迹点{ } &#x3D;1，n 表示样本的数量，k 为高斯混合成分的数量， <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.177.png"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.178.png"> 表示样本值 在高斯混合模型参数 条件下的高斯概率值，其中模型参<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.179.png"></p>
+<p>数 可表示为 <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.180.png"> , , 。等号右边前一项1 &#x3D;1 log <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.181.png"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.182.png"> 为对数似然函数， 用于评估模型拟合情况，后一项<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.173.png" alt="ref6"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.183.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.174.png" alt="ref7"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.184.png"> ∙ 1 −1 log ∆ℎ 为防止过拟合的正<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.185.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.186.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.187.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.188.png"></p>
+<p>−1 &#x3D;1</p>
+<p>则项，其中λ为正则化参数，默认值为 1，∆ℎ 表示各相邻车道中心线之间的平 均距离，正则项中引入一个用于车道宽度信息约束的 sigmoid 函数，由于在实际 的 城市 道路 情况 下 车道 宽度 值 通常 是在 一定 的 范围 内， 例 如 3.25m～ 3.75m， sigmoid 函数能够将实数值映射到(0,1)的区间，对模型中的车道宽度值进行一定 范围内的约束，从而控制各高斯成分峰值分布之间的距离，作为似然函数随着混 合成分数增加时防止过拟合的惩罚项。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.189.png"></p>
+<p>图 <strong>3-43</strong> 车道宽度先验信息约束的 <strong>sigmoid</strong> 函数</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.190.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.191.png"></p>
+<p>图 <strong>3-44</strong> 车道数选取评价准则对比</p>
+<p>对高斯混合模型中选取最佳车道数的评价准则的测试实验结果如图 3-44 所 示。赤池信息量准则（AIC）和贝叶斯信息准则（BIC）是在机器学习中常用的 衡量统计模型拟合优良性的评价函数。但是对于车道数识别，AIC 和 BIC 并不 能够很好的选取最佳模型，因为可能出现随着组件数量的增加拟合效果越好的情 况，但这不符合实际情况。我们所构建的关于车道数选取的评价函数引入了区域 性道路先验知识以提高算法的适用性。相较于传统的 AIC 和 BIC 评价准则，算 法所构建的关于车道数选取的评价函数能够更好的适应车道信息提取的场景。最 终模型选取函数评价值最小的高斯混合模型作为最优模型，确定混合成分的个数 为车道数量，从而自动识别车道关键位置点</p>
+<p><strong>2</strong>） 车道转换区域拓扑与几何构建</p>
+<p>本节介绍了车道转换区域起始和结束车道节点之间拓扑和几何连接的构建，      以确保正确连接和平滑的车道转换。拓扑关系是基于轨迹流信息确定的，该信息<br>指的是车辆通过相邻车道节点的运动模式。创建了一个车道转换概率矩阵，矩阵<br>的每个元素表示从起始节点 i 到结束节点 j 的转换概率，记为 e_{ij}。该概率可</p>
+<p>以计算为：</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.192.png"></p>
+<p>其中，N_{ij}表示车道转换区域内从车道起始节点 i 到车道结束节点 j 通过的 轨迹数量。N_s 和 N_e 分别表示起始节点和结束节点的总数。</p>
+<p>然后，基于车道转换矩阵建立车道拓扑关系。具体而言，对于每个车道起始 节点，我们在车道转换矩阵中寻找转换概率最高的车道结束节点，进行二分图匹 配。低概率的自主换道行为被忽略，而高概率更频繁发生的强制换道行为成为车 道转换区域内建立连接的主要参考。以图(c)中的段落为例，构建的车道转换拓扑 关系如图(d)所示。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.193.jpeg"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.194.jpeg"></p>
+<p>(a) (d)</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.195.jpeg"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.196.jpeg"></p>
+<p>(c) (d)</p>
+<p>图 <strong>3-45</strong> 车道转换区域拓扑与几何构建**: (a)** 车道变化关键位置提取**; (b)** 车道转换拓扑构建**;**</p>
+<p><strong>(c) Frenet</strong> 坐标下的车道转换拓扑关系 <strong>; (d)</strong> 车道转换几何构建</p>
+<p>几何连接是基于相邻车道节点的拓扑关系构建的。车道转换场景中轨迹的复 杂分布和道路曲率的变化增加了难度。为了解决这个问题，我们基于空间投影转 换方法构建车道的几何连接，以确保轨迹运动过程的连续性。具体而言，我们将 车道转换区域的起始和结束车道节点从全局坐标系转换到弗雷内坐标系。然后， 具有拓扑关系的车道起始和结束节点通过直线段连接，如图(c)所示。在弗雷内坐 标系中进行线性连接是合理的，因为即使在车道转换过程中，轨迹的横向和纵向 运动始终是连续的。在弗雷内坐标系中建立线性连接后，将起始和结束车道节点 之间的线段转换回全局坐标系，得到最终的车道几何形状，如图(d)所示。这个 过程确保了车道转换几何形状的局部平滑性。</p>
+<p>最后，通过匹配和合并相邻车道的端点来连接空间上相邻的段落。具体而言， 计算每个车道节点与相邻段落端点之间的距离，并将每个车道节点与最近的相邻 端点进行匹配。在容差范围内匹配的车道节点通过坐标平均值合并为同一节点。 通过这种方式，相邻段落之间的连接在最终的车道级别道路网络中保持一致。</p>
+<ol start="4">
+<li><p>总结 本课题提出了一种从高精度轨迹数据生成车道级道路网络的新方法，并结合 车道变换行为进行分析。该方法通过对轨迹进行分区，以减少处理复杂性。通过 分析轨迹的横向距离分布，确定车道合并或分离的车道转换区域，并进一步进行 轨迹分割。针对车道一致区域和车道转换区域，开发了专用的车道生成策略。对 于车道一致区域，提出了一种基于轨迹的主曲线拟合算法来提取候选车道中心线， 并使用最大团搜索方法检测和修剪由自由变道引起的错误车道中心线。对于与强 制变道行为相关的车道转换区域，提出了一种车道组拟合算法，用于提取车道转 换结构和构建车道级连接。所提出的方法解决了高精度轨迹数据中复杂的车道级 道路网络结构和车道变换行为所带来的挑战。</p>
+<p><strong>4</strong> 实验分析</p>
+</li>
+<li><p>轨迹数据预处理</p>
+</li>
+<li><p>测试用例</p>
+</li>
+</ol>
+<p>测试用例表 4-1-1</p>
+<table>
+<thead>
+<tr>
+<th>测试编号</th>
+<th>CS-1</th>
+<th align="left"></th>
+<th align="left"></th>
+<th align="left"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>测试项目</td>
+<td>轨迹数据清洗</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td>测试目的</td>
+<td>测试轨迹清洗算法对于位置、角度噪声的效果</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td>测试条件</td>
+<td>笔记本，多种采样率数据集</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td>序号</td>
+<td>测试方法与步骤</td>
+<td align="left">预测结果</td>
+<td align="left">实际结果</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td>1</td>
+<td><p>按车辆 id 与时间等对已清洗</p><p>轨迹分段、压缩</p></td>
+<td align="left">按 轨迹 序 号分 段压缩的轨迹</td>
+<td align="left">合 理 ， 分 段</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td>2</td>
+<td>设置噪声类型与参数</td>
+<td align="left">带噪声轨迹</td>
+<td align="left">&#x2F;</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td>3</td>
+<td><p>基于运动特征对轨迹数据进行</p><p>清洗</p></td>
+<td align="left">清洗后轨迹</td>
+<td align="left">准确清洗</td>
+<td align="left"></td>
+</tr>
+</tbody></table>
+<ol start="2">
+<li>测试代码</li>
+</ol>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.197.jpeg"></p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.198.jpeg"></p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.199.jpeg"></p>
+<ol start="3">
+<li>测试报告 轨迹数据在局部应该具有高程值比较稳定的特性，将轨迹数据近似为在同一 高程，则偏航角值（yaw）退化为轨迹点间在地球椭球体上的方向角（orientation）， 进一步可以近似为平面坐标中两点连线与 y 轴正方向间的夹角。 根据偏航角及计算得到的方向角，可以对转角异常点进行检测和识别，当数 据集中存在位置信息的异常点（设备故障或人为加入）时，偏航角信息往往会与 计算得到的方向角相差较大，而对于正常轨迹点，偏航角值与计算得到的方向角 应该比较接近。根据这一特性，可以对数据进行进一步清洗，同时可以对轨迹异 常点清洗结果进行评估，此外结合现有的交通规则对运动速度进行约束也可以有 效抑制漂移点，对比结果如图 4-1 与 4-2 所示。</li>
+</ol>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.200.png"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.201.png"></p>
+<p>（a）原始轨迹数据分布 （b）清洗后轨迹数据分布</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.202.png"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.203.png"></p>
+<p>（c） 清洗前偏航角与方向角对比 （d） 清洗后偏航角与方向角对比</p>
+<p>图 <strong>4-1</strong> 基于运动特征的轨迹清洗方法</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.204.png" alt="ref8"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.205.jpeg"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.206.png"></p>
+<p>图 <strong>4-2 0927</strong> 数据集清洗效果图 （左）清洗前（右）清洗后</p>
+<p>在具体的清洗任务中，主要分为两步，第一步是对一定比例的数据进行不同 类型如角度、空间位置的噪声赋予，第二步是针对带噪声的轨迹进行清洗工作。 如图 4-2-3，分别展示了轨迹点，带噪声的轨迹点，以及带噪声的轨迹与清洗后 的轨迹对比。</p>
+<p>轨 迹 点 分 布 图<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.207.png"></p>
+<ul>
+<li><p>黄 色 为 待 清 洗 轨 迹 点 ）<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.208.png"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.209.png"></p>
+<p>待 清 洗 轨 迹<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.210.png"></p>
+<p>清 洗 后 轨 迹<img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.211.png"></p>
+</li>
+</ul>
+<p>图 <strong>4-2-3</strong> 轨迹清洗前后示意</p>
+<p>在噪声赋予时，首先确定带噪声的轨迹点比例，针对选定轨迹点可采用均值 为 0，标准差分别为 10m，20m，30m 的参数生成位置噪声与均值为 0，标准差 分别为 30°，40°，50°的参数生成航向角噪声。</p>
+<p>表 4-1-2 在 3hz 采样率数据集效果</p>
+<table>
+<thead>
+<tr>
+<th>噪声参数 噪声比例</th>
+<th>d&#x3D;10,∠&#x3D;0</th>
+<th>d&#x3D;20,∠&#x3D;0</th>
+<th>d&#x3D;30,∠&#x3D;0</th>
+<th>d&#x3D;0,∠&#x3D;30</th>
+<th>d&#x3D;0,∠&#x3D;40</th>
+<th>d&#x3D;0,∠&#x3D;50</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0.1</td>
+<td>0.999</td>
+<td>1.000</td>
+<td>1.000</td>
+<td>0.969</td>
+<td>0.970</td>
+<td>0.975</td>
+</tr>
+<tr>
+<td>0.2</td>
+<td>0.999</td>
+<td>1.000</td>
+<td>1.000</td>
+<td>0.942</td>
+<td>0.950</td>
+<td>0.957</td>
+</tr>
+<tr>
+<td>0.3</td>
+<td>0.999</td>
+<td>0.999</td>
+<td>0.999</td>
+<td>0.919</td>
+<td>0.933</td>
+<td>0.943</td>
+</tr>
+<tr>
+<td>0.4</td>
+<td>0.999</td>
+<td>0.999</td>
+<td>0.999</td>
+<td>0.903</td>
+<td>0.920</td>
+<td>0.932</td>
+</tr>
+</tbody></table>
+<p>表 4-1-3 在压缩后数据集效果</p>
+<table>
+<thead>
+<tr>
+<th>噪声比例</th>
+<th>10%</th>
+<th>20%</th>
+<th>30%</th>
+<th>40%</th>
+</tr>
+</thead>
+</table>
+<table>
+<thead>
+<tr>
+<th>噪声参数</th>
+<th align="left"></th>
+<th align="left"></th>
+<th align="left"></th>
+<th align="left"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>d&#x3D;10,∠&#x3D;0</td>
+<td align="left">0.981</td>
+<td align="left">0.993</td>
+<td align="left">0.992</td>
+<td align="left">0.990</td>
+</tr>
+<tr>
+<td>d&#x3D;20,∠&#x3D;0</td>
+<td align="left">0.999</td>
+<td align="left">0.998</td>
+<td align="left">0.996</td>
+<td align="left">0.996</td>
+</tr>
+<tr>
+<td>d&#x3D;30,∠&#x3D;0</td>
+<td align="left">1.000</td>
+<td align="left">0.999</td>
+<td align="left">0.998</td>
+<td align="left">0.997</td>
+</tr>
+<tr>
+<td>d&#x3D;0,∠&#x3D;30</td>
+<td align="left">0.958</td>
+<td align="left">0.944</td>
+<td align="left">0.920</td>
+<td align="left">0.900</td>
+</tr>
+<tr>
+<td>d&#x3D;0,∠&#x3D;40</td>
+<td align="left">0.964</td>
+<td align="left">0.944</td>
+<td align="left">0.933</td>
+<td align="left">0.914</td>
+</tr>
+<tr>
+<td>d&#x3D;0,∠&#x3D;50</td>
+<td align="left">0.977</td>
+<td align="left">0.952</td>
+<td align="left">0.939</td>
+<td align="left">0.930</td>
+</tr>
+<tr>
+<td>d&#x3D;10,∠&#x3D;30</td>
+<td align="left">0.997</td>
+<td align="left">0.995</td>
+<td align="left">0.992</td>
+<td align="left">0.991</td>
+</tr>
+<tr>
+<td>d&#x3D;20,∠&#x3D;40</td>
+<td align="left">0.999</td>
+<td align="left">0.998</td>
+<td align="left">0.997</td>
+<td align="left">0.996</td>
+</tr>
+<tr>
+<td>d&#x3D;30,∠&#x3D;50</td>
+<td align="left">0.999</td>
+<td align="left">0.998</td>
+<td align="left">0.997</td>
+<td align="left">0.997</td>
+</tr>
+</tbody></table>
+<p>表 4-1-4 在 0.3hz 采样率数据集效果</p>
+<table>
+<thead>
+<tr>
+<th>噪声比例 噪声参数</th>
+<th>10%</th>
+<th>20%</th>
+<th>30%</th>
+<th>40%</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>d&#x3D;10,∠&#x3D;0</td>
+<td>0.986</td>
+<td>0.996</td>
+<td>0.995</td>
+<td>0.992</td>
+</tr>
+<tr>
+<td>d&#x3D;20,∠&#x3D;0</td>
+<td>0.999</td>
+<td>0.998</td>
+<td>0.998</td>
+<td>0.997</td>
+</tr>
+<tr>
+<td>d&#x3D;30,∠&#x3D;0</td>
+<td>0.999</td>
+<td>0.999</td>
+<td>0.999</td>
+<td>0.997</td>
+</tr>
+<tr>
+<td>d&#x3D;0,∠&#x3D;30</td>
+<td>0.966</td>
+<td>0.935</td>
+<td>0.921</td>
+<td>0.899</td>
+</tr>
+<tr>
+<td>d&#x3D;0,∠&#x3D;40</td>
+<td>0.976</td>
+<td>0.946</td>
+<td>0.929</td>
+<td>0.920</td>
+</tr>
+<tr>
+<td>d&#x3D;0,∠&#x3D;50</td>
+<td>0.975</td>
+<td>0.955</td>
+<td>0.941</td>
+<td>0.931</td>
+</tr>
+<tr>
+<td>d&#x3D;10,∠&#x3D;30</td>
+<td>0.999</td>
+<td>0.997</td>
+<td>0.996</td>
+<td>0.994</td>
+</tr>
+<tr>
+<td>d&#x3D;20,∠&#x3D;40</td>
+<td>0.999</td>
+<td>0.998</td>
+<td>0.998</td>
+<td>0.997</td>
+</tr>
+<tr>
+<td>d&#x3D;30,∠&#x3D;50</td>
+<td>0.999</td>
+<td>0.999</td>
+<td>0.998</td>
+<td>0.997</td>
+</tr>
+</tbody></table>
+<p>如上述表 4-1-2 所示，在相对高频（1 秒内采集多次）的数据集中，因为车 辆作为刚体在局部时序内具有一定的稳定性，所以基于运动特征的轨迹清洗算法 对于 10%~40%的位置噪声具有鲁棒性，清洗的准确率稳定在 99%。对于角度噪 声，噪声越小，清洗的准确率越低，其次，准确率的降低也与轨迹分布在圆曲线 道路上具有一定的影响。</p>
+<p>对比表 4-1-3 与 4-1-4，分别测试了不同噪声比例下，位置噪声，角度噪声与 位置噪声+角度噪声三种噪声模式下的算法准确率。对于单纯的位置噪声与位置 噪声+角度噪声两种模式，因算法能够利用传感器获取的航向角信息，且计算的</p>
+<p>方向角对于位置噪声是具有敏感性的，因此算法准确率保持在 98%，具有鲁棒性。 对于单纯的角度噪声，一是因为轨迹本身就存在因圆曲线道路分布的场景，以及 角度噪声对于运动特征计算本身影响交大，因此在噪声轨迹点比例为 40%，标准 差为 30°的场景下，精度为 89%。</p>
+<p>总体而言，设计的轨迹清洗算法对于噪声具有鲁棒性。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.212.jpeg"></p>
+<p>图 <strong>4-4</strong> 压缩前后的轨迹形态</p>
+<p>变采样轨迹压缩算法利用轨迹点的方位角变化量控制整条轨迹的方向误差， 在此基础上引入距离约束，通过累计角度变化量与累计距离变化量来进行轨迹压 缩的同时，保障压缩后轨迹的方向误差与垂直距离误差。支持在线压缩，具有线 性时间复杂度。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.213.png"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.214.png"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.215.png"></p>
+<p>图 <strong>4-5</strong> 直线段轨迹，交叉口段轨迹，立交段轨迹示例</p>
+<p>表 4-1-5 不同场景轨迹段压缩效果</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>压缩比（%）</th>
+<th>平均压缩误差（cm）</th>
+<th>最大压缩误差（cm）</th>
+<th align="left"></th>
+<th align="left"></th>
+<th align="left"></th>
+<th align="left"></th>
+<th align="left"></th>
+<th align="left"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>场景</td>
+<td>直线段</td>
+<td>交叉口</td>
+<td>立交</td>
+<td align="left">直线段</td>
+<td align="left">交叉口</td>
+<td align="left">立交</td>
+<td align="left">直线段</td>
+<td align="left">交叉口</td>
+<td align="left">立交</td>
+</tr>
+<tr>
+<td><p>滑动窗口</p><p>算法</p></td>
+<td>0.60</td>
+<td>1.84</td>
+<td>1.90</td>
+<td align="left">2.4</td>
+<td align="left">2.6</td>
+<td align="left">2.6</td>
+<td align="left">5</td>
+<td align="left">5</td>
+<td align="left">5</td>
+</tr>
+<tr>
+<td><p>道格拉斯</p><p>算法</p></td>
+<td>0.78</td>
+<td>2.45</td>
+<td>2.52</td>
+<td align="left">1.2</td>
+<td align="left">1.2</td>
+<td align="left">1.2</td>
+<td align="left">4.9</td>
+<td align="left">4.9</td>
+<td align="left">4.9</td>
+</tr>
+<tr>
+<td><p>变采样算</p><p>法</p></td>
+<td>5.12</td>
+<td>10.42</td>
+<td>7.84</td>
+<td align="left">0.3</td>
+<td align="left">0.4</td>
+<td align="left">0.4</td>
+<td align="left">1.4</td>
+<td align="left">2.7</td>
+<td align="left">3.2</td>
+</tr>
+</tbody></table>
+<p>表 4-1-6 不同轨迹数据集压缩效果</p>
+<table>
+<thead>
+<tr>
+<th>数据集</th>
+<th>环岛区域（16 万）</th>
+<th>高架（34 万）</th>
+<th align="left"></th>
+<th align="left"></th>
+<th align="left"></th>
+<th align="left"></th>
+<th align="left"></th>
+<th align="left"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>指标</td>
+<td>运行 时间 （s）</td>
+<td>压缩 比（%）</td>
+<td align="left">平均压 缩误差 （cm）</td>
+<td align="left">最大压 缩误差 （cm）</td>
+<td align="left">运行 时间 （s）</td>
+<td align="left">压缩 比（%）</td>
+<td align="left">平均压 缩误差 （cm）</td>
+<td align="left">最大压 缩误差 （cm）</td>
+</tr>
+<tr>
+<td>滑动窗 口算法</td>
+<td>34.28</td>
+<td>0.02</td>
+<td align="left">0.50</td>
+<td align="left">0.28</td>
+<td align="left">127.72</td>
+<td align="left">0.02</td>
+<td align="left">26.00</td>
+<td align="left">0.28</td>
+</tr>
+<tr>
+<td>道格拉 斯算法</td>
+<td>5.27</td>
+<td>0.03</td>
+<td align="left">0.50</td>
+<td align="left">0.15</td>
+<td align="left">14.33</td>
+<td align="left">0.02</td>
+<td align="left">0.50</td>
+<td align="left">0.15</td>
+</tr>
+<tr>
+<td>变采样 算法</td>
+<td>0.57</td>
+<td>0.16</td>
+<td align="left">0.29</td>
+<td align="left">0.01</td>
+<td align="left">1.46</td>
+<td align="left">0.16</td>
+<td align="left">0.34</td>
+<td align="left">0.01</td>
+</tr>
+</tbody></table>
+<p>实验结果表明，该算法压缩率虽然高于传统的滑动窗口与 DP 算法，但计算 效率大幅度提升，辅助缓存少，而且能够很好地处理大数量级的轨迹，具有较强 的伸缩性。且较好地保留了交叉口区域的轨迹点数据。</p>
+<ol start="4">
+<li>任务指标</li>
+</ol>
+<p>在轨迹清洗任务中，算法对漂移超过 30 米的异常观测点识别精度达到 90%。</p>
+<p>表 4-1-2 在 3hz 采样率数据集效果</p>
+<table>
+<thead>
+<tr>
+<th>噪声参数 噪声比例</th>
+<th>d&#x3D;10,∠&#x3D;0</th>
+<th>d&#x3D;20,∠&#x3D;0</th>
+<th>d&#x3D;30,∠&#x3D;0</th>
+<th>d&#x3D;0,∠&#x3D;30</th>
+<th>d&#x3D;0,∠&#x3D;40</th>
+<th>d&#x3D;0,∠&#x3D;50</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0.1</td>
+<td>0.999</td>
+<td>1.000</td>
+<td>1.000</td>
+<td>0.969</td>
+<td>0.970</td>
+<td>0.975</td>
+</tr>
+<tr>
+<td>0.2</td>
+<td>0.999</td>
+<td>1.000</td>
+<td>1.000</td>
+<td>0.942</td>
+<td>0.950</td>
+<td>0.957</td>
+</tr>
+<tr>
+<td>0.3</td>
+<td>0.999</td>
+<td>0.999</td>
+<td>0.999</td>
+<td>0.919</td>
+<td>0.933</td>
+<td>0.943</td>
+</tr>
+<tr>
+<td>0.4</td>
+<td>0.999</td>
+<td>0.999</td>
+<td>0.999</td>
+<td>0.903</td>
+<td>0.920</td>
+<td>0.932</td>
+</tr>
+</tbody></table>
+<p>表 4-1-3 在压缩后数据集效果</p>
+<table>
+<thead>
+<tr>
+<th>噪声比例 噪声参数</th>
+<th>10%</th>
+<th>20%</th>
+<th>30%</th>
+<th>40%</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>d&#x3D;10,∠&#x3D;0</td>
+<td>0.981</td>
+<td>0.993</td>
+<td>0.992</td>
+<td>0.990</td>
+</tr>
+<tr>
+<td>d&#x3D;20,∠&#x3D;0</td>
+<td>0.999</td>
+<td>0.998</td>
+<td>0.996</td>
+<td>0.996</td>
+</tr>
+<tr>
+<td>d&#x3D;30,∠&#x3D;0</td>
+<td>1.000</td>
+<td>0.999</td>
+<td>0.998</td>
+<td>0.997</td>
+</tr>
+<tr>
+<td>d&#x3D;0,∠&#x3D;30</td>
+<td>0.958</td>
+<td>0.944</td>
+<td>0.920</td>
+<td>0.900</td>
+</tr>
+<tr>
+<td>d&#x3D;0,∠&#x3D;40</td>
+<td>0.964</td>
+<td>0.944</td>
+<td>0.933</td>
+<td>0.914</td>
+</tr>
+<tr>
+<td>d&#x3D;0,∠&#x3D;50</td>
+<td>0.977</td>
+<td>0.952</td>
+<td>0.939</td>
+<td>0.930</td>
+</tr>
+<tr>
+<td>d&#x3D;10,∠&#x3D;30</td>
+<td>0.997</td>
+<td>0.995</td>
+<td>0.992</td>
+<td>0.991</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>d&#x3D;20,∠&#x3D;40</th>
+<th>0.999</th>
+<th>0.998</th>
+<th>0.997</th>
+<th>0.996</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>d&#x3D;30,∠&#x3D;50</td>
+<td>0.999</td>
+<td>0.998</td>
+<td>0.997</td>
+<td>0.997</td>
+</tr>
+</tbody></table>
+<p>表 4-1-5 在 0.3hz 采样率数据集效果</p>
+<table>
+<thead>
+<tr>
+<th>噪声比例 噪声参数</th>
+<th>10%</th>
+<th>20%</th>
+<th>30%</th>
+<th>40%</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>d&#x3D;10,∠&#x3D;0</td>
+<td>0.986</td>
+<td>0.996</td>
+<td>0.995</td>
+<td>0.992</td>
+</tr>
+<tr>
+<td>d&#x3D;20,∠&#x3D;0</td>
+<td>0.999</td>
+<td>0.998</td>
+<td>0.998</td>
+<td>0.997</td>
+</tr>
+<tr>
+<td>d&#x3D;30,∠&#x3D;0</td>
+<td>0.999</td>
+<td>0.999</td>
+<td>0.999</td>
+<td>0.997</td>
+</tr>
+<tr>
+<td>d&#x3D;0,∠&#x3D;30</td>
+<td>0.966</td>
+<td>0.935</td>
+<td>0.921</td>
+<td>0.899</td>
+</tr>
+<tr>
+<td>d&#x3D;0,∠&#x3D;40</td>
+<td>0.976</td>
+<td>0.946</td>
+<td>0.929</td>
+<td>0.920</td>
+</tr>
+<tr>
+<td>d&#x3D;0,∠&#x3D;50</td>
+<td>0.975</td>
+<td>0.955</td>
+<td>0.941</td>
+<td>0.931</td>
+</tr>
+<tr>
+<td>d&#x3D;10,∠&#x3D;30</td>
+<td>0.999</td>
+<td>0.997</td>
+<td>0.996</td>
+<td>0.994</td>
+</tr>
+<tr>
+<td>d&#x3D;20,∠&#x3D;40</td>
+<td>0.999</td>
+<td>0.998</td>
+<td>0.998</td>
+<td>0.997</td>
+</tr>
+<tr>
+<td>d&#x3D;30,∠&#x3D;50</td>
+<td>0.999</td>
+<td>0.999</td>
+<td>0.998</td>
+<td>0.997</td>
+</tr>
+</tbody></table>
+<ol start="2">
+<li>城市环境多类型、不同规模交叉口车道级拓扑提取</li>
+<li>测试用例</li>
+</ol>
+<p>测试用例表 4-2-1</p>
+<table>
+<thead>
+<tr>
+<th>测试编号</th>
+<th>CS-2</th>
+<th align="left"></th>
+<th align="left"></th>
+<th align="left"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>测试项目</td>
+<td>交叉口提取算法测试</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td>测试目的</td>
+<td>交叉口识别与拓扑提取（包含平面立交与分歧合流场 景）</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td>测试条件</td>
+<td>笔记本，真值区域数据与 28W数据集</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td>序号</td>
+<td>测试方法与步骤</td>
+<td align="left">预测结果</td>
+<td align="left">实际结果</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td>1</td>
+<td>交叉口转向轨迹段提取</td>
+<td align="left">提 取交 叉 口转 向轨迹段</td>
+<td align="left">正确提取</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td>2</td>
+<td>交叉口圆形粗范围提取</td>
+<td align="left">提 取候 选 交叉 口圆形粗范围</td>
+<td align="left">正确提取</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td>3</td>
+<td>交叉口精准范围确认</td>
+<td align="left">精 准提 取 各平 面 交叉 口 在交 叉 口各 道 路分 支 精准 分 界位 置 与交 叉 口精 准范围</td>
+<td align="left">正确提取</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td>4</td>
+<td>交叉口车道级拓扑结构提取</td>
+<td align="left">正 确提 取 交叉 口 内部 转 向信</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th align="left"></th>
+<th align="left"></th>
+<th>息 、车 道 联通 关 系， 生 成交 叉口车道线</th>
+<th align="left"></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">测 试 方 案 示 意 图</td>
+<td align="left"><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.216.jpeg"></td>
+<td></td>
+<td align="left"></td>
+</tr>
+</tbody></table>
+<p>测试结果表 4-2-2</p>
+<table><tr><th colspan="1" rowspan="6" valign="top">技术 指标</th><th colspan="1" valign="top">真 值 区 域 数 据 交 叉口提取</th><th colspan="1" valign="top"><p>准确率:100% （11/11） 召回率:91.7% (11/12)</p><p>F1： 95. 7%</p></th><th colspan="1" valign="top">能正确检测出绝大部 分交叉口</th></tr>
+<tr><td colspan="1" valign="top">真 值 区 域 数 据 交 叉 口 车 道 级 拓 扑 提取</td><td colspan="1" valign="top"><p>准 确 率 ： 98.6%, （141/143）</p><p>召 回 率 ： （141/156）</p><p>90\. 4%</p><p>F1 分：94.3%</p></td><td colspan="1" valign="top">能够准确提取交叉口 车道级拓扑信息</td></tr>
+<tr><td colspan="1" valign="top">包 含 大 量 立 交 区 域数据（28W数据） 交叉口提取</td><td colspan="1" valign="top"><p>准确率：96.2%（53/51） 召回率：92.7%</p><p>F1 分：94.4%</p></td><td colspan="1" valign="top">在包含立交的复杂场 景下能正确提取出绝 大部分交叉口的交叉 口</td></tr>
+<tr><td colspan="1" valign="top">局部 G统计量算法 对比测试</td><td colspan="1" valign="top">准确率：55%（11/20） 召回率：91.7%（11/12） F1 分：68.7%</td><td colspan="1" rowspan="3" valign="top">相比于其他算法本算 法能够正确检测交叉 口</td></tr>
+<tr><td colspan="1" valign="top">形 状 描 述 符 算 法 对比测试</td><td colspan="1" valign="top"><p>准确率：73.3%（11/15） 召回率 91.7% （11/12）</p><p>F1 分：81.5%</p></td></tr>
+<tr><td colspan="1" valign="top">空 间 转 向 点 对 TCPP 算 法 对 比 测 试</td><td colspan="1" valign="top"><p>准确率：75%（12/16） 召回率 100% （12/12）</p><p>F1 分：85.7%</p></td></tr>
+</table>
+2. 测试代码 转向轨迹段提取：
+
+<p>   <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.217.jpeg"></p>
+<p>   转向轨迹段聚类：</p>
+<p>   <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.218.jpeg"></p>
+<p>   提取圆形交叉口粗范围：</p>
+<p>   <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.219.jpeg"></p>
+<p>   提取交叉口精准范围：</p>
+<p>   <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.220.jpeg"></p>
+<p>   <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.221.jpeg"></p>
+<p>   <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.222.jpeg"></p>
+<p>   生成交叉口车道拓扑：</p>
+<p>   <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.223.jpeg"></p>
+<ol start="3">
+<li>测试报告</li>
+</ol>
+<p>（1）测试数据</p>
+<p>测试城市环境多类型、不同规模交叉口车道级拓扑提取算法，测试数据为真 值区域数据，如下图所示：</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.224.jpeg"></p>
+<p>图 <strong>4-2-1</strong> 测试区域轨迹数据</p>
+<p>该区域包含 12 个交叉口，如下图所示：</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.225.jpeg"></p>
+<p>图 <strong>4-2-2</strong> 测试区域交叉口</p>
+<p>（2）转向轨迹段提取效果（绿色轨迹为转向轨迹段）：</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.226.jpeg"></p>
+<p>图 <strong>4-2-3</strong> 转向轨迹段提取效果</p>
+<p>本算法正确提取出区域轨迹尤其是交叉口区域附近的转向轨迹段。 （3）交叉口圆形粗范围提取效果：</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.227.jpeg"></p>
+<p>图 <strong>4-2-4</strong> 交叉口圆形粗范围</p>
+<p>算法成功提取出了区域中的 11 个交叉口，识别准确率为 100%，召回率为 91.7%，F1 分为： 94.4%。</p>
+<p>漏检一个交叉口，漏检原因是轨迹未完全覆盖该交叉口，范围导致算法只能 计算到两条交叉口分支，从而剔除了该交叉口。</p>
+<p>（4）交叉口精准范围提取效果（其中紫色区域未立交，绿色区域为平面交 叉口）：</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.228.jpeg"></p>
+<p>图 <strong>4-2-5</strong> 交叉口精准范围</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.229.png"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.230.png"></p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.231.jpeg"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.232.jpeg"></p>
+<p>图 <strong>4-2-6</strong> 交叉口精准范围细节图</p>
+<p>可以看到算法正确区分了立交与平面交叉口，在平面交叉口区域，算法准确 提取了交叉口各分支分界位置，并提取出交叉口精准范围。</p>
+<p>（5）交叉口拓扑提取效果</p>
+<p>（亮黄色线为生成的交叉口车道线，橙色线为原始轨迹）：</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.233.jpeg"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.234.png"></p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.235.jpeg"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.236.jpeg"></p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.237.jpeg"> <img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.238.jpeg"></p>
+<p>图 <strong>4-2-7</strong> 交叉口车道拓扑</p>
+<p>交叉口车道拓扑，计算交叉口各车道级出入口之间拓扑连接是否正确： 准确率：98.6%,（141&#x2F;143）</p>
+<p>召回率：90.4%（141&#x2F;156）</p>
+<p>F1 分：94.3%</p>
+<p>本算法通过交叉口内部轨迹层次聚类分类不同车道和转向行为的轨迹，通过 主曲线拟合提取交叉口内部车道线，测试结果表明本算法能够提取出准确的交叉 口内部车道级拓扑结构。</p>
+<p>（6）其他交叉口提取算法对比</p>
+<p>对比测试了形状描述算法(Fathi et al., 2010)，局部 G 统计量算法(Wang et al., 2015)以及转向点对算法(Yang et al., 2018)在真值区域数据上效果。</p>
+<p>形状描述算法：</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.239.jpeg"></p>
+<p>图 <strong>4-2-8</strong> 形状描述符算法效果</p>
+<p>算法准确率：73.3%（11&#x2F;15），召回率 91.7%，F1 分：81.5%</p>
+<p>该算法采用在轨迹上滑动形状描述符提取特征向量，通过训练一个 Adaboost 分类器实现交叉口检测，该算法对大部分平面交叉口提取效果较好，但对于大型 立交提取效果较差，原因是分类器训练时学习到的交叉口特征难以适用于复杂大 型立交区域。</p>
+<p>局部 <strong>G</strong> 统计量算法：</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.240.jpeg"></p>
+<p>图 <strong>4-2-9</strong> 局部 <strong>G</strong> 统计量算法效果</p>
+<p>算法准确率：55%（11&#x2F;20），召回率：91.7%（11&#x2F;12），F1 分：68.7%</p>
+<p>该算法采用轨迹空间转向角局部 G 统计量检测交叉口，通过计算轨迹转向 热点，并通过基于 Delaunay 三角剖分的自适应空间聚类算法(ASCDT)将转向热 点聚类以提取交叉口。</p>
+<p>由于算法未剔除 U-turn 轨迹影响，导致 U-turn 段也作为转向热点区域别识 别为交叉口。此外，由于大型立交区域转向轨迹分布相对较散，ASCDT 会将该 区域的转向热点聚为多类，从而导致立交区域被识别为多个交叉口。</p>
+<p>转向点对（<strong>TCPP</strong>）算法：</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.241.jpeg"></p>
+<p>图 <strong>4-2-10</strong> 转向点对（<strong>TCPP</strong>）算法效果</p>
+<p>算法准确率：75%（12&#x2F;16），召回率 100%（12&#x2F;12），F1 分：85.7%</p>
+<p>该算法采用提取转向点对，通过转向点对空间距离以及角度将相近的转向点 对聚类为转向簇，接着采用局部连通性将转向簇聚类为交叉口。</p>
+<p>该算法同样为剔除 U-turn 转向段，从而导致部分 U-turn 段被误检测为交叉 口，同时立交区域轨迹转向段间距离较远，难以通过局部连通性准确聚为一类， 从而导致提取了错误的立交区域。</p>
+<p>（7）其他数据集上的交叉口提取效果</p>
+<p>包含大量立交区域数据集（28w 数据集）：</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.242.jpeg"></p>
+<p>图 <strong>4-2-11 28w</strong> 数据上的交叉口提取效果（整体）</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.243.jpeg"></p>
+<p>图 <strong>4-2-12 28w</strong> 数据上的交叉口提取效果（局部）</p>
+<p>算法准确率：96.2%（51&#x2F;53），召回率：92.7%（53&#x2F;55），F1 分：94.4%</p>
+<p>测试效果表明，在包含大量立交场景数据中，本算法能够提取出绝大部分交</p>
+<p>叉口。</p>
+<ol start="4">
+<li>任务指标</li>
+</ol>
+<p>对比公开主流算法，在算法交叉口位置识别上，在保证准确率与召回率的情 况下，F1 指数对比其余主流算法精度提升满足 5%-10%要求，且在范围识别上作 了提升。</p>
+<p>表 4-2-3 本算法整理效果</p>
+<table>
+<thead>
+<tr>
+<th>指标&#x2F;数据集</th>
+<th>真值区域</th>
+<th>真值区域</th>
+<th><p>最大数据集</p><p>（ 28W）</p></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>检测对象</td>
+<td>交叉口检测</td>
+<td>交叉口车道拓扑</td>
+<td>交叉口检测</td>
+</tr>
+<tr>
+<td>准确率</td>
+<td>100% （11&#x2F;11）</td>
+<td>98.6%（141&#x2F;143）</td>
+<td>96.2% （51&#x2F;53）</td>
+</tr>
+<tr>
+<td>召回率</td>
+<td>91.7% （11&#x2F;12）</td>
+<td>90.4%（141&#x2F;156）</td>
+<td>92.7% （53&#x2F;55）</td>
+</tr>
+<tr>
+<td>F1 指数</td>
+<td>95.7%</td>
+<td>94.3%</td>
+<td>94.4%</td>
+</tr>
+</tbody></table>
+<p>表 4-2-4 不同算法整体对比效果</p>
+<table>
+<thead>
+<tr>
+<th>方法&#x2F;指标</th>
+<th>准确率</th>
+<th>召回率</th>
+<th>F1 指数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>局部 G统计量</td>
+<td>55%（11&#x2F;20）</td>
+<td>91.7%（11&#x2F;12）</td>
+<td>68.7%</td>
+</tr>
+<tr>
+<td>形状描述符</td>
+<td>73.3 （11&#x2F;15）</td>
+<td>91.7% （11&#x2F;12）</td>
+<td>81.5%</td>
+</tr>
+<tr>
+<td><p>空间转向点对</p><p>TCPP</p></td>
+<td>75% （12&#x2F;16）</td>
+<td>100% （12&#x2F;12）</td>
+<td>85.7%</td>
+</tr>
+<tr>
+<td>本方法</td>
+<td>100%（11&#x2F;11）</td>
+<td>91.7% (11&#x2F;12)</td>
+<td>95.7%</td>
+</tr>
+</tbody></table>
+<ol start="3">
+<li>道路结构变化场景车道几何信息提取技术</li>
+<li>测试用例</li>
+</ol>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.244.jpeg"></p>
+<p>图 <strong>4-3-1</strong> 测试用例**: (a)<strong>测试用轨迹数据</strong>; (b)<strong>原始轨迹数据分布细节</strong>; (c)<strong>真值数据标注细节</strong>.**</p>
+<p>本课题的提出算法在长安汽车股份有限公司于 2023 年 7 月在中国重庆采集 的真实车辆轨迹数据集上进行评估，如图 4-3-1(a)所示。该数据集由配备实时动 态定位系统的移动地图车辆收集，共包含 2200 条轨迹和 150 万个观测点。每个 观测点记录了时间戳、经纬度坐标、行驶方向的方位角和行驶速度。数据采样频 率为 10Hz，定位精度在 20 厘米以内，保证了较高的精度。为了评估课题提出的 方法提取的车道级路网，我们首先获取车道边界的地面真值数据。然后根据车道 边界数据手动标注车道中心线。图 4-3-1(b)和 4-3-1 (c)展示了原始轨迹数据和地 面真值数据的详细视图。</p>
+<ol start="2">
+<li><p>测试代码 轨迹数据预分区</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.245.jpeg"></p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.246.jpeg"></p>
+</li>
+<li><p>测试报告</p>
+</li>
+<li><p>性能评估指标 在性能评估部分，我们使用多种评估指标来比较算法的性能。这些指标包括车道 位置指标和地图推断研究中常用的其他评估指标，如下所述。</p>
+</li>
+<li><p>车道位置精度指标。该指标根据提取的每个车道位置与地面真值之间的欧 氏距离来评估车道位置。与地面真值距离在 0.5 米以内的车道位置被标记 为真阳性。车道位置精确率被计算为真阳性与总提取的车道位置的比值， 召回率被计算为真阳性与总地面真值车道位置的比值。还计算了 F1 分数进 行评估。</p>
+</li>
+<li><p>TOPO 指 标 。 TOPO 指 标 使 用 由 Biagioni 等 人 在 论 文 中 引 入 的 “holes and marbles”方法，评估生成地图和实际地图之间的拓扑相似性。在离随机初 始化点 300 米半径范围内的实际地图边缘上每隔 5 米放置一个”hole”，然后 以相同的方式从推断地图中最近的相应点放下”marble”。然后通过在 1 米 的匹配距离内评估 marbles 和 holes 之间的最大一对一匹配来计算精确度和 召回率：</p>
+</li>
+<li><p>最短路径指标：最短路径指标反映了道路网络提供准确的路径规划和导航 信息的能力。该指标通过随机抽样 1,000 个起点-终点对，然后计算在推断 地图上的这些对之间的最短路径距离，并与实际地图进行比较。正确率通 过在 5%路径距离容差内具有相似最短路径的对的比例进行计算。</p>
+</li>
+<li><p>Junction 指标：Junction 指标评估生成的道路网络和实际道路网络中的交叉 度。交叉度指的是道路网络中连接到一个交叉口的车道数量，反映了道路 网络的局部拓扑。我们报告交叉口指标的精确度、召回率和 F1 分数。</p>
+</li>
+<li><p>与学术界主流算法的对比分析 本课题所提出的车道级道路网络生成算法与以下学术界主流最先进方法进行 比较：</p>
+</li>
+<li><p>Cao。该算法通过检查每个轨迹，确定是否可以将其与现有边缘集成，或 者是否需要创建新边缘，逐步将轨迹合并为道路网络。</p>
+</li>
+<li><p>Chen。该算法利用轨迹均值漂移采样和基于图的聚类方法提取车道段并推 断段之间的链接，用于道路网络的创建。</p>
+</li>
+<li><p>Kharita。该算法使用 k-means 聚类构建初始图进行车道推断，并使用图展 开器去除冗余边缘。</p>
+</li>
+<li><p>Arman。该算法包含三步，通过 GMM 识别节点，提取道路中心线，并估 计整个道路段的车道偏移。</p>
+</li>
+</ol>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.247.jpeg"></p>
+<p>图 <strong>4-3-2</strong> 车道几何信息提取结果</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.248.jpeg" alt="ref9"></p>
+<p>表 <strong>4-1</strong></p>
+<p>表 4-1 展示了所提出方法与最先进算法在车道位置、TOPO 和交叉度指标方 面的性能结果。我们的方法在车道位置（F1 得分为 0.891）、TOPO（F1 得分为 0.919）和交叉度（F1 得分为 0.764）指标上取得了优秀的结果。所提出方法的 F1 得分分别比最佳对比方法高出 7.9%、8.6%和 14.5%。</p>
+<p>在表 4-中，我们报告了最短路径指标的性能结果，该指标衡量了道路网络提 供准确最短路径连接的能力。所提出的方法表现出卓越的性能，正确率为 0.845， 比最佳对比算法高出 18%。Cao 和 Chen 的结果由于片段导致无路径错误，正确 率较低。Kharita 的结果存在较高的虚假路径错误，生成许多连接不存在的平行</p>
+<p>车道的虚假路径。Arman 的方法为整个道路长度生成车道，看起来是连续的，但 与原始轨迹的实际车道位置存在偏差。相比之下，所提出的方法在保持准确可靠 的路径连接的同时，最小化了虚假连接。量化结果表明，所提出的方法在车道级 道路网络生成方面优于最先进算法。</p>
+<p>图 展 示 了 整 个 研 究 区 域 的 车 道 级 道 路 网 络 生 成 结 果 。 图 \ref{Evaluation-case-figure}展示了我们的方法和最先进算法在不同情况下（包括 曲线匝道、环状交叉口和立交桥）生成的车道级道路网络。所提出方法在各种情 况下表现出卓越的适应性。如图 4-2-3 (b)所示，Cao 的方法存在断开的车道，这 可能是由于在增量合并过程中某些轨迹部分断开的原因。Chen 的方法在评估指</p>
+<p>标中表现最差，如图 4-2-3 (c)所示。它在轨迹重叠或交叉的区域产生了大量错误 的交织段。Kharita 虽然在 TOPO 召回率方面表现较高，但常常产生连接平行车 道的虚假片段，如图 4-2-3 (d)所示。这是由于车道之间的边缘冗余和错误的图展 开操作。Arman 的方法在车道位置方面表现较好，但在交叉度和 TOPO 方面表现 较差，如图 4-2-3 (e)所示。相比之下，所提出的方法在各种情况下都能生成准确 的车道级道路网络。</p>
+<p>综上所述，所提出的车道级道路网络生成方法在车道位置、TOPO、交叉度 和最短路径等评估指标上表现出优越性能，相较于最先进的方法，取得了更好的 结果。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.249.jpeg"></p>
+<p>图 <strong>4-2-3</strong> 与主流先进算法的车道提取结果对比</p>
+<ol start="3">
+<li>算法模块消融实验分析 为了评估本课题提出方法中采用的各个算法功能模块的有效性，我们对几种 方法的变体进行了比较实验。这些方法变体旨在去除提出方法的主要算法模块， 从而显示特定算法模块功能的显著性：</li>
+<li>完整方法包括所有主要算法模块，包括基于车道变化结构识别的轨迹分割 （TS），基 于轨 迹的主 曲线 拟合 （ TPCF），用 于车 道一致 区域 的变 道检测 （LCD），以及用于车道转换区域的车道组拟合（LGF）。</li>
+<li>TPCF + LCD：该方法变体去除了 TS 部分，由于缺乏车道变化结构识别，将 所有路段都视为车道一致区域进行处理。</li>
+<li>TS + TPCF + LGF：该方法变体在不处理自由变道行为的车道一致区域的情 况下排除了 LCD 部分，并保持其他算法模块不变。</li>
+<li>TS + TPCF + LCD：对于该方法变体，我们删除了车道转换区域的 LGF 部分， 而是直接连接提取的车道位置，省略车道转换区域的车道拓扑和几何构建步 骤，同时保持其他算法模块不变。</li>
+</ol>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.250.jpeg"></p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.251.jpeg"></p>
+<p>图 <strong>4-2-4</strong> 算法模块消融实验分析**: (a)<strong>原始轨迹数据</strong>; (b)**</p>
+<p>本课题提出的完整方法及其它方法变体的性能比较结果如表所示。图 4-2-4 显示了方法变体生成的车道的可视化结果。以图 4-2-4(a)从两车道转换为三车道 的道路段中的轨迹数据作为可视化示例。</p>
+<p>对于去除轨迹分割部分的 TPCF + LCD 方法变体，在所有指标上性能结果显 著降低。去除轨迹分割部分导致无法区分车道结构的变化，导致丢失车道，如图 4-2-4 (b)所示。这证明了基于车道转换识别的轨迹分割步骤的有效性。</p>
+<p>TS + TPCF + LGF方法变体的结果显示出许多冗余的车道错误，如图 4-2-4 (c) 所示。尽管该方法变体具有较高的位置召回率，但缺乏变道行为的检测和修剪导 致了较低的精度。</p>
+<p>对于 TS + TPCF + LCD 方法变体，结果表明对于车道转换区域的不当处理 可能导致不现实的车道转换结构，如图 4-2-4 (d)所示。虽然车道转换区域只占道 路网络的一小部分并对整体网络评估影响有限，但它们确实影响局部拓扑连通性， 这在 SP 和交叉口指标的降低中得到了证明。</p>
+<p>当所有主要算法功能模块组合在一起时，获得了最高的性能结果和最佳的车 道生成结果，如图 4-2-4 (e)所示。该方法变体的比较结果显示了提出方法的各主 要算法模块的有效性。</p>
+<ol start="4">
+<li><p>算法敏感性分析 为了研究参数选择对整体性能的影响，通过改变参数来评估参数的敏感性。 缓冲区宽度参数是指轨迹分割步骤中使用的缓冲窗口的宽度。图 4-2-5 (a)显 示，在 30-100 米的范围内，缓冲区宽度的敏感性较低。将其扩展到 100 米，可 以略微提高查全率，表明更好地覆盖了车道变化区域。 车道聚类宽度定义了车道轨迹聚类中的最大距离。在图 4-2-5 (b)中，性能结 果在一定范围内保持稳定，但过大的车道宽度可能会降低性能，因为实际车道宽 度通常不超过 3.75 米。 TPCF 采样间隔距离用于选定的用于车道中心线拟合的 初始轨迹。图 4-2-5 (c)显示，采样距离不应过大，以避免丢失车道几何细节并导 致性能下降。</p>
+<p>TPCF 收敛阈值用于确定 TPCF 算法的收敛情况。从图 4-2-5 (d)可以看出， 收敛在适当的阈值范围内保持稳定。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.252.jpeg"></p>
+<p>图 <strong>4-2-5</strong> 算法参数敏感性分析结果：<strong>(a)</strong> 缓冲区宽度；<strong>(b)</strong> 车道聚类宽度；<strong>(c)</strong> 基于轨迹的主 曲线拟合算法采样间隔距离；<strong>(d)</strong> 基于轨迹的主曲线拟合算法收敛阈值。</p>
+<p>通过实验评估了不同轨迹降采样方法的性能，以进行敏感性分析。高精度轨 迹数据以 10Hz 的高采样频率由移动测绘车辆收集，这会导致在处理大量数据时 增加计算成本。图 4-2-6 分别显示了轨迹降采样对车道位置指标和运行效率的影 响。当轨迹以固定采样间隔压缩，随着采样时间间隔增加，采样点数量的减少导 致算法效率显著提高，但是过度降采样会导致原始轨迹的细节丢失，从而降低准 确 性 。 为 了 改 善 轨 迹 降 采 样 过 程 中 出 现 的 误 差 ， 我 们 采 用 道 格 拉 斯 普 克 Douglas-Peucker (DP)算法进行轨迹降采样。该降采样方法保留了轨迹的重要形状 特征，并减少了降采样过程中可能发生的错误。图 4-2-6(c)和(d)中展示了使用道 格拉斯普克法进行轨迹降采样后提出的方法的性能和效率。在合理的轨迹降采样 后，结果表明提出的方法在保持性能的同时实现了改进的效率。值得注意的是， 过度降采样仍可能导致车道细节丢失，而查全率的敏感性高于准确率。</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.253.jpeg"></p>
+<p>图 <strong>4-2-6</strong> 轨迹降采样方法的敏感性分析结果：<strong>(a)</strong> 轨迹以固定采样间隔压缩后的车道位置指 标；<strong>(b)</strong> 轨迹以固定采样间隔压缩后的运行效率；<strong>(c)</strong> 轨迹以道格拉斯普克法压缩后的车道</p>
+</li>
+</ol>
+<p>位置指标；<strong>(d)</strong> 轨迹以道格拉斯普克法压缩后的运行效率。</p>
+<p>为了评估实际应用所需的轨迹数据样本大小，我们随机减少轨迹样本大小， 并评估提取车道的车道位置指标。表 4-4报告了轨迹样本大小的敏感性分析结果， 包括普通道路段、环形交叉口和高架桥。结果表明，提出的方法对轨迹样本大小 的变化具有鲁棒性。随着轨迹样本大小的减少，车道位置的准确性几乎不受影响。 当轨迹样本大小减少到不足以完全覆盖测试路网时，查全率会降低，这是因为较 少的样本可能无法捕捉到所有的车道位置变化。因此，在实际应用中，我们建议 获取足够数量的轨迹样本，以保证较高的车道提取性能。</p>
+<p>表 <strong>4-4</strong> 轨迹样本大小敏感性分析结果</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.254.jpeg"></p>
+<ol start="4">
+<li><p>任务指标 如下表所示，在车道识别任务上，对比学术界公开主流算法精度提升满足 5%-10%的要求；</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.248.jpeg" alt="ref9"></p>
+<p><strong>5</strong> 过程文档归纳</p>
+<p>课题按照合同要求，对过程文档、会议记录、知识成果、宣传交流等方面执 行与存档。</p>
+</li>
+<li><p>方案与调研报告</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.255.png"></p>
+</li>
+<li><p>算法代码</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.256.png"></p>
+</li>
+<li><p>论文成果</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.257.png"></p>
+</li>
+<li><p>专利成果</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.258.png"></p>
+</li>
+<li><p>过程文档</p>
+<p>（1）会议纪要</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.259.png"></p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.260.png"></p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.261.jpeg"></p>
+<p>（2）月度例会</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.262.png"></p>
+<p>（3）前沿交流</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.263.png"></p>
+<p>（4）进展报告</p>
+<p><img src="/Aspose.Words.7d20ed06-34cf-436f-9229-c9ae1204b47a.264.jpeg"></p>
+</li>
+</ol>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://coder-will.github.io">JingHan Zhang</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://coder-will.github.io/2025/04/30/%E5%9F%BA%E4%BA%8E%E4%BC%97%E5%8C%85%E8%BD%A8%E8%BF%B9%E6%95%B0%E6%8D%AE%E7%9A%84%E9%81%93%E8%B7%AF%E4%BF%A1%E6%81%AF%E6%8F%90%E5%8F%96%E6%8A%80%E6%9C%AF/">https://coder-will.github.io/2025/04/30/%E5%9F%BA%E4%BA%8E%E4%BC%97%E5%8C%85%E8%BD%A8%E8%BF%B9%E6%95%B0%E6%8D%AE%E7%9A%84%E9%81%93%E8%B7%AF%E4%BF%A1%E6%81%AF%E6%8F%90%E5%8F%96%E6%8A%80%E6%9C%AF/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://coder-will.github.io" target="_blank">鸿哲斋414</a>！</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related  no-desc" href="/2025/04/30/article-title/" title="article title"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">article title</div></div></div></a><a class="pagination-related" href="/2025/05/02/hello-world/" title="Hello World"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">Hello World</div></div><div class="info-2"><div class="info-item-1">Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick StartCreate a new post1$ hexo new &quot;My New Post&quot;  More info: Writing Run server1$ hexo server  More info: Server Generate static files1$ hexo generate  More info: Generating Deploy to remote sites1$ hexo deploy  More info: Deployment </div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">JingHan Zhang</div><div class="author-info-description">工作三年多，把所学所获用文档的方式及代码记录下来，常看常新，多学多练</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/coder-will" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:cheerupzjh@163.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/05/02/hello-world/" title="Hello World">Hello World</a><time datetime="2025-05-02T15:34:44.835Z" title="发表于 2025-05-02 23:34:44">2025-05-02</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/04/30/%E5%9F%BA%E4%BA%8E%E4%BC%97%E5%8C%85%E8%BD%A8%E8%BF%B9%E6%95%B0%E6%8D%AE%E7%9A%84%E9%81%93%E8%B7%AF%E4%BF%A1%E6%81%AF%E6%8F%90%E5%8F%96%E6%8A%80%E6%9C%AF/" title="基于众包轨迹数据的道路信息提取技术">基于众包轨迹数据的道路信息提取技术</a><time datetime="2025-04-30T07:44:45.000Z" title="发表于 2025-04-30 15:44:45">2025-04-30</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/04/30/article-title/" title="article title">article title</a><time datetime="2025-04-30T06:45:36.000Z" title="发表于 2025-04-30 14:45:36">2025-04-30</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2025 By JingHan Zhang</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.3.5</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
